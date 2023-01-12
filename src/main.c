@@ -14,19 +14,4 @@ int main (int argc, char *argv[]) {
 
   read_input(index_file_path, graph_file_path);
   parse_stop_words(stopwords_file_path);
-
-  // const char file_to_read[200] = "inputs/small/pages/305.txt";
-  // char *content = read_whole_file(file_to_read);
-
-  // int amount_tokens =  0;
-  // char **tokens = split(content, " \n", &amount_tokens);
-  // for (int i = 0; i < amount_tokens; i++) {
-  //   printf("token: %s\n", tokens[i]);
-  // }
-
-  // free(content);
-  // for (int i = 0; i < amount_tokens; i++) {
-  //   free(tokens[i]);
-  // }
-  // free(tokens);
 }
