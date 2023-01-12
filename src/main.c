@@ -3,7 +3,6 @@
 #include <string.h>
 #include "../include/utils.h"
 
-
 int main (int argc, char *argv[]) {
   if (argc < 3) {
     usage();

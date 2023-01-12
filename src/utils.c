@@ -35,9 +35,9 @@ void read_input(const char *index_file_path, const char *graph_file_path) {
     printf("line: %s\n", line);
   }
 
-
   fclose(index_file);
   fclose(graph_file);
+  printf("all stopwords: \n");
 }
 
 char *read_whole_file(const char *file_path) {
@@ -55,12 +55,12 @@ char *read_whole_file(const char *file_path) {
   return string;
 }
 
-char **split(const char *str, const char *delimiters, int *num_tokens) {
-  char **tokens = malloc(sizeof(char *));
-  char *copy = strdup(str);
+char** split(const char* str, const char* delimiters, int* num_tokens) {
+  char** tokens = malloc(sizeof(char *));
+  char* copy = strdup(str);
   int tokens_allocated = 1;
   int tokens_used = 0;
-  char *token, *rest = copy;
+  char* token, *rest = copy;
   while ((token = strtok_r(rest, delimiters, &rest))) {
     if (tokens_used == tokens_allocated) {
       tokens_allocated *= 2;
