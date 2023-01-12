@@ -29,15 +29,20 @@ void read_input(const char *index_file_path, const char *graph_file_path) {
     printf("file: %s\n", file_name);
   }
 
-  printf("lines: \n");
-  char line[MAX_LINE_SIZE];
-  while (fscanf(graph_file, "%s", line) == 1) {
-    printf("line: %s\n", line);
+  printf("\nlines: \n");
+  char current_file[MAX_LINE_SIZE];
+  int amount_links = 0;
+  while (fscanf(graph_file, "%s %d", current_file, &amount_links) == 2) {
+    printf("\ncurrent_file: %s\n", current_file);
+    char link[MAX_LINE_SIZE];
+    for (int i = 0; i < amount_links; i++) {
+      fscanf(graph_file, "%s", link);
+      printf("link %d: %s\n", i, link);
+    }
   }
 
   fclose(index_file);
   fclose(graph_file);
-  printf("all stopwords: \n");
 }
 
 char *read_whole_file(const char *file_path) {
@@ -83,7 +88,7 @@ void parse_stop_words(const char *stopwords_file_path) {
   FILE *stopwords_file = fopen(stopwords_file_path, "r");
   check_read_file(stopwords_file, stopwords_file_path);
 
-  printf("all stopwords: \n");
+  printf("\nall stopwords: \n");
   char stopword[MAX_LINE_SIZE];
   while (fscanf(stopwords_file, "%s", stopword) == 1) {
     printf("stopword: %s\n", stopword);
