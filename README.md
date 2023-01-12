@@ -1,4 +1,4 @@
-# Goggle page rank
+# Google page rank
 
 ### Conventions
 
@@ -21,3 +21,5 @@
     outgoing pages relative to the current one. Finally, we must store the page rank, which 
     in turn, 
   - The *page rank* for each page must be initialized with *1/N*, where *N* is the total amount of pages.
+3. We can store the pages in a [red-black-tree](https://en.wikipedia.org/wiki/Red%E2%80%93black_tree) and 
+  then store the links in an adjacent list using either an array or a linked-list.
