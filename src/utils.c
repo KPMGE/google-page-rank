@@ -1,9 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "../include/utils.h"
+#include "../include/red-black-tree.h"
 
-#define MAX_LINE_SIZE 250
+#define MAX_LINE_SIZE 400
+#define DELIMITERS " \n"
+
+void str_to_lower(char **str) {
+  char *str2 = *str;
+  for (int i = 0; str2[i] != '\0'; i++) {
+    str2[i] = tolower(str2[i]);
+  }
+}
 
 void check_read_file(FILE *file, const char *file_path) {
   if (!file) {
@@ -17,29 +27,52 @@ void usage() {
   exit(1);
 }
 
-void read_input(const char *index_file_path, const char *graph_file_path) {
+void read_input(HashTable *table, const char *index_file_path, const char *graph_file_path) {
   FILE *index_file = fopen(index_file_path, "r");
   FILE *graph_file = fopen(graph_file_path, "r");
   check_read_file(index_file, index_file_path);
   check_read_file(graph_file, graph_file_path);
 
-  printf("all files: \n");
+  RBT *rb_tree = RBT_init();
   char file_name[MAX_LINE_SIZE];
-  while (fscanf(index_file, "%s", file_name) == 1) {
-    printf("file: %s\n", file_name);
-  }
 
-  printf("\nlines: \n");
-  char current_file[MAX_LINE_SIZE];
-  int amount_links = 0;
-  while (fscanf(graph_file, "%s %d", current_file, &amount_links) == 2) {
-    printf("\ncurrent_file: %s\n", current_file);
-    char link[MAX_LINE_SIZE];
-    for (int i = 0; i < amount_links; i++) {
-      fscanf(graph_file, "%s", link);
-      printf("link %d: %s\n", i, link);
+  while (fscanf(index_file, "%s", file_name) == 1) {
+    char file_path[MAX_LINE_SIZE];
+    sprintf(file_path, "inputs/big/pages/%s", file_name);
+    printf("file_path: %s\n", file_path);
+    char *file_content = read_whole_file(file_path);
+
+    int amount_words = 0;
+    char **words = split(file_content, DELIMITERS, &amount_words);
+    
+    for (int i = 0; i < amount_words; i++) {
+      bool is_stop_word = ht_search(table, words[i]);
+      if (!is_stop_word) {
+        rb_tree = RBT_insert(rb_tree, words[i]);
+        RBT *node = RBT_search(rb_tree, words[i]);
+        if (!node) {
+          printf("NOT FOUND: %s\n", words[i]);
+        } else {
+          RBT_add_page(node, file_name);
+        }
+      }
     }
   }
+  
+  RBT_print(rb_tree);
+  
+
+  // printf("\nlines: \n");
+  // char current_file[MAX_LINE_SIZE];
+  // int amount_links = 0;
+  // while (fscanf(graph_file, "%s %d", current_file, &amount_links) == 2) {
+  //   printf("\ncurrent_file: %s\n", current_file);
+  //   char link[MAX_LINE_SIZE];
+  //   for (int i = 0; i < amount_links; i++) {
+  //     fscanf(graph_file, "%s", link);
+  //     printf("link %d: %s\n", i, link);
+  //   }
+  // }
 
   fclose(index_file);
   fclose(graph_file);
@@ -47,6 +80,8 @@ void read_input(const char *index_file_path, const char *graph_file_path) {
 
 char *read_whole_file(const char *file_path) {
   FILE *f = fopen(file_path, "rb");
+  check_read_file(f, file_path);
+
   fseek(f, 0, SEEK_END);
   long fsize = ftell(f);
   fseek(f, 0, SEEK_SET);
