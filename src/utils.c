@@ -84,15 +84,18 @@ char** split(const char* str, const char* delimiters, int* num_tokens) {
   return tokens;
 }
 
-void parse_stop_words(const char *stopwords_file_path) {
+HashTable *parse_stop_words(const char *stopwords_file_path) {
   FILE *stopwords_file = fopen(stopwords_file_path, "r");
   check_read_file(stopwords_file, stopwords_file_path);
 
-  printf("\nall stopwords: \n");
   char stopword[MAX_LINE_SIZE];
+  HashTable *table = create_table(CAPACITY);
+
   while (fscanf(stopwords_file, "%s", stopword) == 1) {
-    printf("stopword: %s\n", stopword);
+    ht_insert(table, stopword);
   }
 
   fclose(stopwords_file);
+
+  return table;
 }
