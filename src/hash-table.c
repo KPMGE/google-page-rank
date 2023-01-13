@@ -1,4 +1,6 @@
 #include "../include/hash-table.h"
+#include "../include/utils.h"
+#include <strings.h>
 
 struct Ht_item {
   char *key;
@@ -162,6 +164,8 @@ void handle_collision(HashTable *table, unsigned long index, Ht_item *item) {
 }
 
 void ht_insert(HashTable *table, char *key) {
+  str_to_lower(&key);
+
   Ht_item *item = create_item(key);
   unsigned long index = hash_function(key);
   Ht_item *current_item = table->items[index];
@@ -181,12 +185,14 @@ void ht_insert(HashTable *table, char *key) {
 }
 
 bool ht_search(HashTable *table, char *key) {
+  str_to_lower(&key);
+
   int index = hash_function(key);
   Ht_item *item = table->items[index];
   LinkedList *head = table->overflow_buckets[index];
 
   while (item != NULL) {
-    if (strcmp(item->key, key) == 0) {
+    if (strcasecmp(item->key, key) == 0) {
       return true;
     }
     if (head == NULL) {
