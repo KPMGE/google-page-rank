@@ -33,34 +33,37 @@ void read_input(HashTable *table, const char *index_file_path, const char *graph
   check_read_file(index_file, index_file_path);
   check_read_file(graph_file, graph_file_path);
 
-  RBT *rb_tree = RBT_init();
+  RBT *rb_tree = NULL;
   char file_name[MAX_LINE_SIZE];
 
   while (fscanf(index_file, "%s", file_name) == 1) {
     char file_path[MAX_LINE_SIZE];
-    sprintf(file_path, "inputs/big/pages/%s", file_name);
+    sprintf(file_path, "inputs/small/pages/%s", file_name);
     printf("file_path: %s\n", file_path);
     char *file_content = read_whole_file(file_path);
 
     int amount_words = 0;
     char **words = split(file_content, DELIMITERS, &amount_words);
+
+    free(file_content);
     
     for (int i = 0; i < amount_words; i++) {
       bool is_stop_word = ht_search(table, words[i]);
+
       if (!is_stop_word) {
         rb_tree = RBT_insert(rb_tree, words[i]);
         RBT *node = RBT_search(rb_tree, words[i]);
-        if (!node) {
-          printf("NOT FOUND: %s\n", words[i]);
-        } else {
-          RBT_add_page(node, file_name);
-        }
+        RBT_add_page(node, file_name);
       }
+
+      free(words[i]);
     }
+
+    free(words);
   }
-  
+
   RBT_print(rb_tree);
-  
+  RBT_free(rb_tree);
 
   // printf("\nlines: \n");
   // char current_file[MAX_LINE_SIZE];
@@ -126,7 +129,7 @@ HashTable *parse_stop_words(const char *stopwords_file_path) {
   char stopword[MAX_LINE_SIZE];
   HashTable *table = create_table(CAPACITY);
 
-  while (fscanf(stopwords_file, "%s", stopword) == 1) {
+  while (fscanf(stopwords_file, "%s\n", stopword) == 1) {
     ht_insert(table, stopword);
   }
 

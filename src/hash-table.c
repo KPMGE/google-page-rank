@@ -90,8 +90,7 @@ static void free_linkedlist(LinkedList *list) {
   while (list) {
     temp = list;
     list = list->next;
-    free(temp->item->key);
-    free(temp->item);
+    free_item(temp->item);
     free(temp);
   }
 }
@@ -110,7 +109,6 @@ static void free_overflow_buckets(HashTable *table) {
     free_linkedlist(buckets[i]);
   }
   free(buckets);
-  free(table);
 }
 
 Ht_item *create_item(char *key) {
