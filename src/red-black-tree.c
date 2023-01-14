@@ -87,6 +87,7 @@ RBT *RBT_insert(RBT *h, char *word) {
   } else if (cmp > 0) {
     h->r = RBT_insert(h->r, word);
   } else /*cmp == 0*/ {
+    free(h->word);
     h->word = strdup(word);
   }
 
@@ -123,9 +124,7 @@ RBT *RBT_search(RBT *n, char *word) {
 
 void RBT_print(RBT *h) {
   if (h) {
-    if (h->word) {
-      printf("%s -> {", h->word);
-    }
+    printf("%s -> {", h->word);
     linked_list_print(h->pages);
     printf("}\n");
     RBT_print(h->l);
@@ -137,9 +136,7 @@ void RBT_free(RBT *h) {
   if (h) {
     RBT_free(h->l);
     RBT_free(h->r);
-    if (h->word) {
-      free(h->word);
-    }
+    free(h->word);
     linked_list_free(h->pages);
     free(h);
   }
