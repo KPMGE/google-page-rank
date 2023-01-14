@@ -2,6 +2,8 @@
 #include "../include/utils.h"
 #include <strings.h>
 
+#define LARGEST_PRIME 65521
+
 struct Ht_item {
   char *key;
 };
@@ -12,20 +14,20 @@ struct LinkedList {
 };
 
 struct HashTable {
-  // Contains an array of pointers
-  // to items
   Ht_item **items;
   LinkedList **overflow_buckets;
   int size;
   int count;
 };
 
-unsigned long hash_function(char *str) {
-  unsigned long i = 0;
-  for (int j = 0; str[j]; j++) {
-    i += str[j];
+static unsigned long hash_function(const char *s) {
+  unsigned long s1 = 1;
+  unsigned long s2 = 0;
+  for (int i = 0; s[i]; i++) {
+    s1 = (s1 + s[i]) % LARGEST_PRIME; 
+    s2 = (s1 + s2) % LARGEST_PRIME;
   }
-  return i % CAPACITY;
+  return ((s2 << 16) | s1) % CAPACITY;
 }
 
 static LinkedList *allocate_list() {

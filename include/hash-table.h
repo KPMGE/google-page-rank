@@ -14,8 +14,6 @@ typedef struct LinkedList LinkedList;
 
 typedef struct HashTable HashTable;
 
-unsigned long hash_function(char* str);
-
 // static LinkedList* allocate_list ();
 // static LinkedList* linkedlist_insert(LinkedList* list, Ht_item* item);
 // static Ht_item* linkedlist_remove(LinkedList* list);

@@ -16,6 +16,7 @@ int main (int argc, char *argv[]) {
 
   HashTable *table = parse_stop_words(stopwords_file_path);
   read_input(table, index_file_path, graph_file_path);
+  print_table(table);
   free_table(table);
 }
 
