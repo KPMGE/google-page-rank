@@ -32,6 +32,8 @@ static unsigned long hash_function(const char *s) {
 
 static LinkedList *allocate_list() {
   LinkedList *list = malloc(sizeof(LinkedList));
+  list->item = NULL;
+  list->next = NULL;
   return list;
 }
 
