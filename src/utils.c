@@ -27,11 +27,9 @@ void usage() {
   exit(1);
 }
 
-void read_input(HashTable *table, const char *index_file_path, const char *graph_file_path) {
+RBT *parse_lookup_rbt(HashTable *table, const char *index_file_path) {
   FILE *index_file = fopen(index_file_path, "r");
-  FILE *graph_file = fopen(graph_file_path, "r");
   check_read_file(index_file, index_file_path);
-  check_read_file(graph_file, graph_file_path);
 
   RBT *rb_tree = NULL;
   char file_name[MAX_LINE_SIZE];
@@ -62,9 +60,6 @@ void read_input(HashTable *table, const char *index_file_path, const char *graph
     free(words);
   }
 
-  RBT_print(rb_tree);
-  RBT_free(rb_tree);
-
   // printf("\nlines: \n");
   // char current_file[MAX_LINE_SIZE];
   // int amount_links = 0;
@@ -78,7 +73,7 @@ void read_input(HashTable *table, const char *index_file_path, const char *graph
   // }
 
   fclose(index_file);
-  fclose(graph_file);
+  return rb_tree;
 }
 
 char *read_whole_file(const char *file_path) {
