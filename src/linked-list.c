@@ -53,7 +53,7 @@ bool linked_list_has_page(LinkedList *list, const char *page) {
 void linked_list_print(LinkedList *list) {
   Cell *p;
   for (p = list->first; p != NULL; p = p->next) {
-    printf("%s ", p->page);
+    printf(" %s ", p->page);
   }
 }
 

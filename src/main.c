@@ -14,6 +14,8 @@ int main (int argc, char *argv[]) {
   const char *stopwords_file_path = argv[2];
   const char *graph_file_path = argv[3];
 
+  parse_graph_rbt(graph_file_path);
+
   HashTable *table = parse_stop_words(stopwords_file_path);
   RBT *lookup_rbt = parse_lookup_rbt(table, index_file_path);
 

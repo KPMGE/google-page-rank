@@ -60,18 +60,6 @@ RBT *parse_lookup_rbt(HashTable *table, const char *index_file_path) {
     free(words);
   }
 
-  // printf("\nlines: \n");
-  // char current_file[MAX_LINE_SIZE];
-  // int amount_links = 0;
-  // while (fscanf(graph_file, "%s %d", current_file, &amount_links) == 2) {
-  //   printf("\ncurrent_file: %s\n", current_file);
-  //   char link[MAX_LINE_SIZE];
-  //   for (int i = 0; i < amount_links; i++) {
-  //     fscanf(graph_file, "%s", link);
-  //     printf("link %d: %s\n", i, link);
-  //   }
-  // }
-
   fclose(index_file);
   return rb_tree;
 }
@@ -110,7 +98,7 @@ char** split(const char* str, const char* delimiters, int* num_tokens) {
     free(tokens);
     tokens = NULL;
   } else {
-    tokens = realloc(tokens, tokens_used * sizeof(char*));
+    tokens = realloc(tokens, tokens_used * sizeof(char *));
   }
   *num_tokens = tokens_used;
   free(copy);
@@ -131,4 +119,27 @@ HashTable *parse_stop_words(const char *stopwords_file_path) {
   fclose(stopwords_file);
 
   return table;
+}
+
+void parse_graph_rbt(const char *graph_file_path) {
+  FILE *graph_file = fopen(graph_file_path, "r");
+  check_read_file(graph_file, graph_file_path);
+
+  char current_file[MAX_LINE_SIZE];
+  int amount_links = 0;
+  RBT *rbt = NULL;
+
+  while (fscanf(graph_file, "%s %d", current_file, &amount_links) == 2) {
+    rbt = RBT_insert(rbt, current_file);
+
+    char link[MAX_LINE_SIZE];
+    for (int i = 0; i < amount_links; i++) {
+      fscanf(graph_file, "%s", link);
+      RBT *node = RBT_search(rbt, current_file);
+      RBT_add_page(node, link);
+    }
+  }
+
+  RBT_print(rbt);
+  RBT_free(rbt);
 }
