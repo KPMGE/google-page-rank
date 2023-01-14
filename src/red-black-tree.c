@@ -35,13 +35,13 @@ void RBT_add_page(RBT *h, char *page) {
   }
 }
 
-bool is_red(RBT *x) {
+static bool is_red(RBT *x) {
   if (x == NULL)
     return BLACK;
   return x->color; // RED == true
 }
 
-RBT *rotate_left(RBT *h) {
+static RBT *rotate_left(RBT *h) {
   RBT *x = h->r;
   h->r = x->l;
   x->l = h;
@@ -50,7 +50,7 @@ RBT *rotate_left(RBT *h) {
   return x;
 }
 
-RBT *rotate_right(RBT *h) {
+static RBT *rotate_right(RBT *h) {
   RBT *x = h->l;
   h->l = x->r;
   x->r = h;
@@ -59,7 +59,7 @@ RBT *rotate_right(RBT *h) {
   return x;
 }
 
-void flip_colors(RBT *h) {
+static void flip_colors(RBT *h) {
   h->color = RED;
   h->l->color = BLACK;
   h->r->color = BLACK;
