@@ -58,14 +58,14 @@ void linked_list_print(LinkedList *list) {
 }
 
 void linked_list_free(LinkedList *list) {
-  Cell *p;
-  Cell *c;
+  Cell *head = list->first;
 
-  for (p = list->first; p != NULL; p = p->next) {
-    c = p->next;
-    free(p->page);
-    free(p);
-    p = c;
+  while (head) {
+    Cell *temp = head;
+    head = head->next;
+    free(temp->page);
+    free(temp);
   }
+
   free(list);
 }

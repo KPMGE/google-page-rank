@@ -18,7 +18,7 @@ struct node {
   RBT *l, *r;
 };
 
-static RBT *RBT_create_node(char *word, bool color) {
+RBT *RBT_create_node(char *word, bool color) {
   RBT *node = malloc(sizeof(RBT));
   node->word = strdup(word);
   node->pages = linked_list_init();
@@ -32,6 +32,7 @@ RBT *RBT_init() {
   RBT *node = malloc(sizeof(RBT));
   node->pages = linked_list_init();
   node->color = RED;
+  node->word = NULL;
   node->l = node->r = NULL;
 
   return node;
@@ -80,13 +81,13 @@ RBT *RBT_insert(RBT *h, char *word) {
     return RBT_create_node(word, RED);
   }
 
-  int cmp = strcmp(word, h->word);
+  int cmp = strcasecmp(word, h->word);
   if (cmp < 0) {
     h->l = RBT_insert(h->l, word);
   } else if (cmp > 0) {
     h->r = RBT_insert(h->r, word);
   } else /*cmp == 0*/ {
-    h->word = word;
+    h->word = strdup(word);
   }
 
   // Lean left.
@@ -118,12 +119,13 @@ RBT *RBT_search(RBT *n, char *word) {
       return n;
   }
   return NULL;
-  // return NULL_Value;
 }
 
 void RBT_print(RBT *h) {
   if (h) {
-    printf("%s -> {", h->word);
+    if (h->word) {
+      printf("%s -> {", h->word);
+    }
     linked_list_print(h->pages);
     printf("}\n");
     RBT_print(h->l);
@@ -135,7 +137,9 @@ void RBT_free(RBT *h) {
   if (h) {
     RBT_free(h->l);
     RBT_free(h->r);
-    free(h->word);
+    if (h->word) {
+      free(h->word);
+    }
     linked_list_free(h->pages);
     free(h);
   }
