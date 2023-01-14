@@ -28,16 +28,6 @@ RBT *RBT_create_node(char *word, bool color) {
   return node;
 }
 
-RBT *RBT_init() {
-  RBT *node = malloc(sizeof(RBT));
-  node->pages = linked_list_init();
-  node->color = RED;
-  node->word = NULL;
-  node->l = node->r = NULL;
-
-  return node;
-}
-
 void RBT_add_page(RBT *h, char *page) {
   bool page_exists = linked_list_has_page(h->pages, page);
   if (!page_exists) {
