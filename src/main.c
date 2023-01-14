@@ -4,6 +4,7 @@
 #include "../include/utils.h"
 #include "../include/hash-table.h"
 #include "../include/red-black-tree.h"
+#include "../include/generic-red-black-tree.h"
 
 int main (int argc, char *argv[]) {
   if (argc < 3) {

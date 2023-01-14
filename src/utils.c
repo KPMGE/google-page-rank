@@ -31,7 +31,7 @@ RBT *parse_lookup_rbt(HashTable *table, const char *index_file_path) {
   FILE *index_file = fopen(index_file_path, "r");
   check_read_file(index_file, index_file_path);
 
-  RBT *rb_tree = NULL;
+  RBT *rb_tree = RBT_init();
   char file_name[MAX_LINE_SIZE];
 
   while (fscanf(index_file, "%s", file_name) == 1) {
@@ -49,9 +49,8 @@ RBT *parse_lookup_rbt(HashTable *table, const char *index_file_path) {
       bool is_stop_word = ht_search(table, words[i]);
 
       if (!is_stop_word) {
-        rb_tree = RBT_insert(rb_tree, words[i]);
-        RBT *node = RBT_search(rb_tree, words[i]);
-        RBT_add_page(node, file_name);
+        RBT_insert(rb_tree, words[i]);
+        RBT_add_page(rb_tree, words[i], file_name);
       }
 
       free(words[i]);
@@ -127,19 +126,19 @@ void parse_graph_rbt(const char *graph_file_path) {
 
   char current_file[MAX_LINE_SIZE];
   int amount_links = 0;
-  RBT *rbt = NULL;
+  RBT *rbt = RBT_init();
 
-  while (fscanf(graph_file, "%s %d", current_file, &amount_links) == 2) {
-    rbt = RBT_insert(rbt, current_file);
+  while (fscanf(graph_file, "%s %d ", current_file, &amount_links) == 2) {
+    RBT_insert(rbt, current_file);
 
     char link[MAX_LINE_SIZE];
     for (int i = 0; i < amount_links; i++) {
       fscanf(graph_file, "%s", link);
-      RBT *node = RBT_search(rbt, current_file);
-      RBT_add_page(node, link);
+      RBT_add_page(rbt, current_file, link);
     }
   }
 
+  fclose(graph_file);
   RBT_print(rbt);
   RBT_free(rbt);
 }
