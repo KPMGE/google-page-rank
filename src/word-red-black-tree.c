@@ -1,4 +1,4 @@
-#include "../include/red-black-tree.h"
+#include "../include/word-red-black-tree.h"
 #include "../include/generic-red-black-tree.h"
 #include "../include/linked-list.h"
 #include <stdbool.h>
@@ -22,42 +22,41 @@ static void print_linked_list(void *data) {
   linked_list_print(list);
 }
 
-RBT *RBT_init() {
-  RBT *new = malloc(sizeof(RBT));
-  new->rbt = NULL;
-  return new;
-}
-
 static void* alloc_initial_linked_list() {
   return linked_list_init();
 }
 
-void RBT_insert(RBT *h, char *word) {
+WRBT *word_rbt_init() {
+  WRBT *new = malloc(sizeof(WRBT));
+  new->rbt = NULL;
+  return new;
+}
+
+void word_rbt_insert(WRBT *h, char *word) {
   h->rbt = grbt_insert(h->rbt, word, alloc_initial_linked_list);
 }
 
-RBT *RBT_search(RBT *n, char *word) {
+WRBT *word_rbt_search(WRBT *n, char *word) {
   GRBT *node = grbt_search(n->rbt, word);
 
   if (!node) return NULL;
 
-  RBT *new = RBT_init();
+  WRBT *new = word_rbt_init();
   new->rbt = node;
 
   return new;
 }
 
-
-void RBT_free(RBT *h) { 
+void word_rbt_free(WRBT *h) { 
   grbt_free(h->rbt, free_linked_list);
   free(h);
 }
 
-void RBT_print(RBT *h) {
+void word_rbt_print(WRBT *h) {
   grbt_print(h->rbt, print_linked_list);
 }
 
-void RBT_add_page(RBT *h, char *key, char *page) {
+void word_rbt_add_page(WRBT *h, char *key, char *page) {
   GRBT *node = grbt_search(h->rbt, key);
   if (!node) return;
 
