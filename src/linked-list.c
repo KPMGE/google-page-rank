@@ -14,12 +14,14 @@ struct cell {
 typedef struct linked_list {
   Cell *first;
   Cell *last;
+  int amount_nodes;
 } LinkedList;
 
 LinkedList *linked_list_init() {
   LinkedList *list = malloc(sizeof(LinkedList));
   list->first = NULL;
   list->last = NULL;
+  list->amount_nodes = 0;
   return list;
 }
 
@@ -27,6 +29,7 @@ void linked_list_insert(LinkedList *list, char *page) {
   Cell *new = malloc(sizeof(Cell));
   new->page = strdup(page);
   new->next = NULL;
+  list->amount_nodes++;
 
   if (list->first == NULL) {
     list->first = list->last = new;
@@ -68,4 +71,21 @@ void linked_list_free(LinkedList *list) {
   }
 
   free(list);
+}
+
+int linked_list_amount_nodes(LinkedList *list) {
+  return list->amount_nodes;
+}
+
+char **linked_list_to_pages(LinkedList *list) {
+  Cell *head = list->first;
+  char **pages = malloc(sizeof(char *) * list->amount_nodes);
+  int i = 0;
+
+  while (head) {
+    pages[i++] = head->page;
+    head = head->next;
+  }
+
+  return pages;
 }

@@ -36,15 +36,14 @@ void word_rbt_insert(WRBT *h, char *word) {
   h->rbt = grbt_insert(h->rbt, word, alloc_initial_linked_list);
 }
 
-WRBT *word_rbt_search(WRBT *n, char *word) {
+char **word_rbt_search(WRBT *n, char *word, int *amount_pages) {
   GRBT *node = grbt_search(n->rbt, word);
 
-  if (!node) return NULL;
+  LinkedList *list = grbt_data(node);
+  char **pages = linked_list_to_pages(list);
+  *amount_pages = linked_list_amount_nodes(list);
 
-  WRBT *new = word_rbt_init();
-  new->rbt = node;
-
-  return new;
+  return pages;
 }
 
 void word_rbt_free(WRBT *h) { 

@@ -15,13 +15,24 @@ int main (int argc, char *argv[]) {
   const char *stopwords_file_path = argv[2];
   const char *graph_file_path = argv[3];
 
+
   HashTable *table = parse_stop_words(stopwords_file_path);
   WRBT *lookup_rbt = parse_lookup_rbt(table, index_file_path);
   PRBT *pages_rbt = parse_graph_rbt(graph_file_path);
 
-  print_table(table);
-  word_rbt_print(lookup_rbt);
-  page_rbt_print(pages_rbt);
+  char *query = "introduction";
+  int amount_pages = 0;
+  char **found_pages = word_rbt_search(lookup_rbt, query, &amount_pages);
+
+  printf("found pages for %s\n", query);
+  for (int i = 0; i < amount_pages; i++) {
+    printf("page: %s\n", found_pages[i]);
+  }
+  free(found_pages);
+
+  // print_table(table);
+  // word_rbt_print(lookup_rbt);
+  // page_rbt_print(pages_rbt);
 
   free_table(table);
   word_rbt_free(lookup_rbt);
