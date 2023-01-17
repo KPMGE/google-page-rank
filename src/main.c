@@ -4,7 +4,7 @@
 #include "../include/utils.h"
 #include "../include/hash-table.h"
 #include "../include/word-red-black-tree.h"
-#include "../include/generic-red-black-tree.h"
+#include "../include/page-red-black-tree.h"
 
 int main (int argc, char *argv[]) {
   if (argc < 3) {
@@ -15,15 +15,16 @@ int main (int argc, char *argv[]) {
   const char *stopwords_file_path = argv[2];
   const char *graph_file_path = argv[3];
 
-  parse_graph_rbt(graph_file_path);
-
   HashTable *table = parse_stop_words(stopwords_file_path);
   WRBT *lookup_rbt = parse_lookup_rbt(table, index_file_path);
+  PRBT *pages_rbt = parse_graph_rbt(graph_file_path);
 
   print_table(table);
   word_rbt_print(lookup_rbt);
+  page_rbt_print(pages_rbt);
 
-  word_rbt_free(lookup_rbt);
   free_table(table);
+  word_rbt_free(lookup_rbt);
+  page_rbt_free(pages_rbt);
 }
 

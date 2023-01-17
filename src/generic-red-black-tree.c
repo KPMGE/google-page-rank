@@ -111,7 +111,7 @@ GRBT *grbt_search(GRBT *n, char *word) {
 }
 void grbt_print(const GRBT *h, print_fn fn) {
   if (h) {
-    printf("%s -> {", h->word);
+    printf("\n%s -> {", h->word);
     fn(h->data);
     printf("}\n");
     grbt_print(h->l, fn);

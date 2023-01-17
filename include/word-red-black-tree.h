@@ -6,7 +6,6 @@
 typedef struct node WRBT;
 
 WRBT* word_rbt_init();
-
 void word_rbt_add_page(WRBT *h, char *key, char *page);
 void word_rbt_insert(WRBT *h, char *word);
 WRBT *word_rbt_search(WRBT *n, char *word);

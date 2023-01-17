@@ -1,4 +1,5 @@
 #include "../include/utils.h"
+#include "../include/page-red-black-tree.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +37,7 @@ WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path) {
   while (fscanf(index_file, "%s", file_name) == 1) {
     char file_path[MAX_LINE_SIZE];
     sprintf(file_path, "inputs/small/pages/%s", file_name);
-    printf("file_path: %s\n", file_path);
+    // printf("file_path: %s\n", file_path);
     char *file_content = read_whole_file(file_path);
 
     int amount_words = 0;
@@ -119,25 +120,55 @@ HashTable *parse_stop_words(const char *stopwords_file_path) {
   return table;
 }
 
-void parse_graph_rbt(const char *graph_file_path) {
+// void parse_graph_rbt(const char *graph_file_path) {
+//   FILE *graph_file = fopen(graph_file_path, "r");
+//   check_read_file(graph_file, graph_file_path);
+
+//   char current_file[MAX_LINE_SIZE];
+//   int amount_links = 0;
+//   WRBT *rbt = word_rbt_init();
+
+//   while (fscanf(graph_file, "%s %d ", current_file, &amount_links) == 2) {
+//     word_rbt_insert(rbt, current_file);
+
+//     char link[MAX_LINE_SIZE];
+//     for (int i = 0; i < amount_links; i++) {
+//       fscanf(graph_file, "%s", link);
+//       word_rbt_add_page(rbt, current_file, link);
+//     }
+//   }
+
+//   fclose(graph_file);
+//   word_rbt_print(rbt);
+//   word_rbt_free(rbt);
+// }
+
+PRBT* parse_graph_rbt(const char *graph_file_path) {
   FILE *graph_file = fopen(graph_file_path, "r");
   check_read_file(graph_file, graph_file_path);
 
   char current_file[MAX_LINE_SIZE];
   int amount_links = 0;
-  WRBT *rbt = word_rbt_init();
+  PRBT *rbt = page_rbt_init();
 
-  while (fscanf(graph_file, "%s %d ", current_file, &amount_links) == 2) {
-    word_rbt_insert(rbt, current_file);
+  char links_buffer[MAX_LINE_SIZE * 10];
 
-    char link[MAX_LINE_SIZE];
+  while (fscanf(graph_file, "%s %d %[^\n]", current_file, &amount_links, links_buffer) == 3) {
+    // insert current file into the pages rbt
+    page_rbt_insert(rbt, current_file);
+    // split links_buffer into tokens(words)
+    char **links = split(links_buffer, DELIMITERS, &amount_links);
+    // add links to rbt
+    page_rbt_add_links(rbt, current_file, amount_links, links);
+
+    // free links
     for (int i = 0; i < amount_links; i++) {
-      fscanf(graph_file, "%s", link);
-      word_rbt_add_page(rbt, current_file, link);
+      free(links[i]);
     }
+    free(links);
   }
 
   fclose(graph_file);
-  word_rbt_print(rbt);
-  word_rbt_free(rbt);
+
+  return rbt;
 }
