@@ -26,9 +26,8 @@
 
 ### References
 We've used the course material from our professor along with: 
-[page rank - wikipedia](https://en.wikipedia.org/wiki/PageRank)
-[red-black-tree - geeksforgeeks](https://www.geeksforgeeks.org/introduction-to-red-black-tree/)
-[hahstable - tutorialspoint](https://www.tutorialspoint.com/data_structures_algorithms/hash_table_program_in_c.htm)
-[hashtable - Ben Hoyt](https://benhoyt.com/writings/hash-table-in-c/)
-[hahstable - digitalocean](https://www.digitalocean.com/community/tutorials/hash-table-in-c-plus-plus)
-
+- [page rank - wikipedia](https://en.wikipedia.org/wiki/PageRank)
+- [red-black-tree - geeksforgeeks](https://www.geeksforgeeks.org/introduction-to-red-black-tree/)
+- [hahstable - tutorialspoint](https://www.tutorialspoint.com/data_structures_algorithms/hash_table_program_in_c.htm)
+- [hashtable - Ben Hoyt](https://benhoyt.com/writings/hash-table-in-c/)
+- [hahstable - digitalocean](https://www.digitalocean.com/community/tutorials/hash-table-in-c-plus-plus)
