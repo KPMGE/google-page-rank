@@ -67,28 +67,6 @@ static LinkedList *linkedlist_insert(LinkedList *list, Ht_item *item) {
   return list;
 }
 
-static Ht_item *linkedlist_remove(LinkedList *list) {
-  if (!list) {
-    return NULL;
-  }
-  if (!list->next) {
-    return NULL;
-  }
-
-  LinkedList *node = list->next;
-  LinkedList *temp = list;
-  temp->next = NULL;
-  list = node;
-  Ht_item *it = NULL;
-
-  memcpy(temp->item, it, sizeof(Ht_item));
-  free(temp->item->key);
-  free(temp->item);
-  free(temp);
-
-  return it;
-}
-
 static void free_linkedlist(LinkedList *list) {
   LinkedList *temp = list;
   while (list) {
