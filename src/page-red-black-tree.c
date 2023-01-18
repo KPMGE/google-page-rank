@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define MAX_INCOMING_LINKS 1000
 #define DAMPING_FACTOR 0.8
@@ -112,16 +113,20 @@ float calculate_page_rank(PRBT *p, char *page_name, int num_pages) {
 
   float prev_page_rank = -1;
   float new_rank = page->page_rank;
+  float error = INFINITY;
 
-  while((new_rank - prev_page_rank) > EPSILON) {
+  while(error > EPSILON) {
     prev_page_rank = new_rank;
     new_rank = (1 - DAMPING_FACTOR);
-    for (int i = 0; i < page->num_outgoing_links; i++) {
+
+    for (int i = 0; i < page->num_incoming_links; i++) {
       GRBT *incoming_link_node = grbt_search(p->rbt, page->incoming_links[i]);
-      PageData *incoming_link = grbt_data(node);
+      PageData *incoming_link = grbt_data(incoming_link_node);
 
       new_rank += DAMPING_FACTOR * (incoming_link->page_rank / incoming_link->num_outgoing_links);
     }
+
+    error = (new_rank - prev_page_rank) / num_pages;
   }
   page->page_rank = new_rank;
 

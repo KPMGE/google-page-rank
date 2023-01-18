@@ -15,6 +15,13 @@ void str_to_lower(char **str) {
   }
 }
 
+void check_null_pointer(void *input, const char *message) {
+  if (!input) {
+    fprintf(stderr, "could not open file: %s\n", message);
+    exit(1);
+  }
+}
+
 void check_read_file(FILE *file, const char *file_path) {
   if (!file) {
     fprintf(stderr, "could not open file: %s\n", file_path);
@@ -27,7 +34,7 @@ void usage() {
   exit(1);
 }
 
-WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path) {
+WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path, int *total_pages) {
   FILE *index_file = fopen(index_file_path, "r");
   check_read_file(index_file, index_file_path);
 
@@ -35,6 +42,8 @@ WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path) {
   char file_name[MAX_LINE_SIZE];
 
   while (fscanf(index_file, "%s", file_name) == 1) {
+    *total_pages += 1;
+
     char file_path[MAX_LINE_SIZE];
     sprintf(file_path, "inputs/small/pages/%s", file_name);
     // printf("file_path: %s\n", file_path);
@@ -47,7 +56,6 @@ WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path) {
 
     for (int i = 0; i < amount_words; i++) {
       bool is_stop_word = ht_search(table, words[i]);
-
       if (!is_stop_word) {
         word_rbt_insert(rb_tree, words[i]);
         word_rbt_add_page(rb_tree, words[i], file_name);
