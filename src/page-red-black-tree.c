@@ -5,6 +5,8 @@
 #include <stdlib.h>
 
 #define MAX_INCOMING_LINKS 1000
+#define DAMPING_FACTOR 0.8
+#define EPSILON 0.0001
 
 typedef struct {
   float page_rank; 
@@ -98,4 +100,30 @@ void page_rbt_add_links(PRBT *h, char *page_name, int num_outgoing_links, char *
 void page_rbt_free(PRBT *h) {
   grbt_free(h->rbt, free_data);
   free(h);
+}
+
+float calculate_page_rank(PRBT *p, char *page_name, int num_pages) {
+  GRBT *node = grbt_search(p->rbt, page_name); 
+  if (!node) return -1; // Return -1 if page is not found
+
+  //Calculate the PageRank through iterations
+  PageData *page = grbt_data(node);
+  page->page_rank = 1.0 / num_pages;
+
+  float prev_page_rank = -1;
+  float new_rank = page->page_rank;
+
+  while((new_rank - prev_page_rank) > EPSILON) {
+    prev_page_rank = new_rank;
+    new_rank = (1 - DAMPING_FACTOR);
+    for (int i = 0; i < page->num_outgoing_links; i++) {
+      GRBT *incoming_link_node = grbt_search(p->rbt, page->incoming_links[i]);
+      PageData *incoming_link = grbt_data(node);
+
+      new_rank += DAMPING_FACTOR * (incoming_link->page_rank / incoming_link->num_outgoing_links);
+    }
+  }
+  page->page_rank = new_rank;
+
+  return new_rank;
 }
