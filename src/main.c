@@ -12,36 +12,50 @@ int main (int argc, char *argv[]) {
     usage();
   }
 
-  const char *index_file_path = argv[1];
-  char *index_copy = strdup(index_file_path);
-  const char *stopwords_file_path = argv[2];
-  const char *graph_file_path = argv[3];
-  int total_pages = 0;
+  int qtd = 0;
+  char **s = parse_searches("inputs/small/searches.txt", &qtd);
 
-  HashTable *table = parse_stop_words(stopwords_file_path);
-  WRBT *lookup_rbt = parse_lookup_rbt(table, index_file_path, dirname(index_copy), &total_pages);
-  PRBT *pages_rbt = parse_graph_rbt(graph_file_path);
-
-  char *query = "history";
-  int amount_pages = 0;
-  char **found_pages = word_rbt_search(lookup_rbt, query, &amount_pages);
-
-  check_null_pointer(found_pages,  "No pages found for query: %s'\n");
-
-  printf("found pages for %s\n", query);
-  for (int i = 0; i < amount_pages; i++) {
-    float page_rank = calculate_page_rank(pages_rbt, found_pages[i], total_pages);
-    printf("page: %s, page_rank: %.3f\n", found_pages[i], page_rank);
+  printf("searches: \n");
+  for (int i = 0; i < qtd; i++) {
+    printf("%s\n", s[i]);
   }
-  free(found_pages);
 
-  // print_table(table);
-  // word_rbt_print(lookup_rbt);
-  // page_rbt_print(pages_rbt);
+  for (int i = 0; i < qtd; i++) {
+    free(s[i]);
+  }
+  free(s);
 
-  free(index_copy);
-  free_table(table);
-  word_rbt_free(lookup_rbt);
-  page_rbt_free(pages_rbt);
+
+  // const char *index_file_path = argv[1];
+  // char *index_copy = strdup(index_file_path);
+  // const char *stopwords_file_path = argv[2];
+  // const char *graph_file_path = argv[3];
+  // int total_pages = 0;
+
+  // HashTable *table = parse_stop_words(stopwords_file_path);
+  // WRBT *lookup_rbt = parse_lookup_rbt(table, index_file_path, dirname(index_copy), &total_pages);
+  // PRBT *pages_rbt = parse_graph_rbt(graph_file_path);
+
+  // char *query = "history";
+  // int amount_pages = 0;
+  // char **found_pages = word_rbt_search(lookup_rbt, query, &amount_pages);
+
+  // check_null_pointer(found_pages,  "No pages found for query: %s'\n");
+
+  // printf("found pages for %s\n", query);
+  // for (int i = 0; i < amount_pages; i++) {
+  //   float page_rank = calculate_page_rank(pages_rbt, found_pages[i], total_pages);
+  //   printf("page: %s, page_rank: %.3f\n", found_pages[i], page_rank);
+  // }
+  // free(found_pages);
+
+  // // print_table(table);
+  // // word_rbt_print(lookup_rbt);
+  // // page_rbt_print(pages_rbt);
+
+  // free(index_copy);
+  // free_table(table);
+  // word_rbt_free(lookup_rbt);
+  // page_rbt_free(pages_rbt);
 }
 

@@ -14,5 +14,6 @@ char *read_whole_file(const char *file_path);
 void str_to_lower(char **str);
 HashTable *parse_stop_words(const char *stopwords_file_path);
 void check_null_pointer(void *input, const char *message);
+char **parse_searches(const char *search_file_path, int *num_searches);
 
 #endif // !UTILS_H

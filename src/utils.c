@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_LINE_SIZE 400
+#define MAX_LINE_SIZE 300
 #define DELIMITERS " \n"
 
 void str_to_lower(char **str) {
@@ -179,4 +179,37 @@ PRBT* parse_graph_rbt(const char *graph_file_path) {
   fclose(graph_file);
 
   return rbt;
+}
+
+static int count_file_lines(const char *file_path) {
+  FILE *file = fopen(file_path, "r");
+  check_read_file(file, file_path);
+
+  int count = 0;
+  char buffer[MAX_LINE_SIZE];
+  while (fscanf(file, "%[^\n]\n", buffer) == 1) {
+    count++;
+  }
+
+  fclose(file);
+
+  return count;
+}
+
+char **parse_searches(const char *search_file_path, int *num_searches) {
+  FILE *search_file = fopen(search_file_path, "r");
+  check_read_file(search_file, search_file_path);
+
+  int search_file_num_lines = count_file_lines(search_file_path);
+  *num_searches = search_file_num_lines;
+  char **searches = malloc(sizeof(char *) * search_file_num_lines);
+
+  int k = 0;
+  char buffer[MAX_LINE_SIZE];
+  while (fscanf(search_file, "%[^\n]\n", buffer) == 1) {
+    searches[k++] = strdup(buffer);
+  }
+
+  fclose(search_file);
+  return searches;
 }
