@@ -34,7 +34,7 @@ void usage() {
   exit(1);
 }
 
-WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path, int *total_pages) {
+WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path, const char *pages_dir, int *total_pages) {
   FILE *index_file = fopen(index_file_path, "r");
   check_read_file(index_file, index_file_path);
 
@@ -45,7 +45,7 @@ WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path, int *total
     *total_pages += 1;
 
     char file_path[MAX_LINE_SIZE];
-    sprintf(file_path, "inputs/small/pages/%s", file_name);
+    sprintf(file_path, "%s/pages/%s", pages_dir, file_name);
     // printf("file_path: %s\n", file_path);
     char *file_content = read_whole_file(file_path);
 

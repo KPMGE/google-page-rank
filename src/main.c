@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/utils.h"
+#include <libgen.h>
 #include "../include/hash-table.h"
 #include "../include/word-red-black-tree.h"
 #include "../include/page-red-black-tree.h"
@@ -12,16 +13,16 @@ int main (int argc, char *argv[]) {
   }
 
   const char *index_file_path = argv[1];
+  char *index_copy = strdup(index_file_path);
   const char *stopwords_file_path = argv[2];
   const char *graph_file_path = argv[3];
-
   int total_pages = 0;
 
   HashTable *table = parse_stop_words(stopwords_file_path);
-  WRBT *lookup_rbt = parse_lookup_rbt(table, index_file_path, &total_pages);
+  WRBT *lookup_rbt = parse_lookup_rbt(table, index_file_path, dirname(index_copy), &total_pages);
   PRBT *pages_rbt = parse_graph_rbt(graph_file_path);
 
-  char *query = "commercial";
+  char *query = "history";
   int amount_pages = 0;
   char **found_pages = word_rbt_search(lookup_rbt, query, &amount_pages);
 
@@ -38,6 +39,7 @@ int main (int argc, char *argv[]) {
   // word_rbt_print(lookup_rbt);
   // page_rbt_print(pages_rbt);
 
+  free(index_copy);
   free_table(table);
   word_rbt_free(lookup_rbt);
   page_rbt_free(pages_rbt);
