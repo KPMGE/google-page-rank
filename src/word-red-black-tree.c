@@ -42,6 +42,8 @@ char **word_rbt_search(WRBT *n, char *word, int *amount_pages) {
   if (!node) return NULL;
 
   LinkedList *list = grbt_data(node);
+  if (!list) return NULL;
+
   char **pages = linked_list_to_pages(list);
   *amount_pages = linked_list_amount_nodes(list);
 

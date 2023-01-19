@@ -14,13 +14,6 @@ typedef struct LinkedList LinkedList;
 
 typedef struct HashTable HashTable;
 
-// static LinkedList* allocate_list ();
-// static LinkedList* linkedlist_insert(LinkedList* list, Ht_item* item);
-// static Ht_item* linkedlist_remove(LinkedList* list);
-// static void free_linkedlist(LinkedList* list);
-// static LinkedList** create_overflow_buckets(HashTable* table);
-// static void free_overflow_buckets(HashTable* table);
-
 Ht_item* create_item(char* key);
 HashTable* create_table(int size);
 void free_item(Ht_item* item);

@@ -213,3 +213,81 @@ char **parse_searches(const char *search_file_path, int *num_searches) {
   fclose(search_file);
   return searches;
 }
+
+static void display_word_set(char **set, int size_set) {
+  printf("\nset: ");
+  for (int i = 0; i < size_set; i++) {
+    if (i % 5 == 0) {
+      printf("\n");
+    }
+    printf("%s ", set[i]);
+  }
+  printf("\n");
+}
+
+static char **intersection_word_sets(
+  char **first_set,
+  int size_first_set,
+  char **second_set,
+  int size_second_set, 
+  int *size_set
+) {
+  // hash-table for quickly looking up elements 
+  HashTable *table = create_table(CAPACITY);
+
+  // insert all elements from the first set into the hash-table
+  for (int i = 0; i < size_first_set; i++) {
+    ht_insert(table, first_set[i]);
+  }
+
+  int k = 0;
+  char **result_set = malloc(sizeof(char *));
+
+  for (int i = 0; i < size_second_set; i++) {
+    char *current_page = second_set[i];
+
+    const bool current_page_intersects = ht_search(table, current_page);
+    // if current for the second term appears on the hash-table, we know we needa add it to the intersection set
+    if (current_page_intersects) {
+      result_set = realloc(result_set, ++k * sizeof(char *));
+      result_set[k - 1] = strdup(current_page);
+    }
+  }
+
+  *size_set = k;
+  free_table(table);
+
+  return result_set;
+}
+
+// find the intersection given a list of search words
+char** intersection_pages_search_words(WRBT *lookup_rbt, char **search_words, int num_search_words) {
+  // NOTE: (A ∩ B) ∩ C == A ∩ (B ∩ C) == B ∩ (A ∩ C)
+ 
+  // find pages for the first search word
+  printf("pages for each search word sets: \n");
+
+  int num_pages = 0;
+  char **pages = word_rbt_search(lookup_rbt, search_words[0], &num_pages);
+  printf("\nword: %s\n", search_words[0]);
+  display_word_set(pages, num_pages);
+
+  int size_result_set = num_pages;
+
+  for (int i = 1; i < num_search_words; i++) {
+    printf("\nword: %s\n", search_words[i]);
+    // find intersection pages between the current word and the next one and set the 'pages' buffer to the result
+    int next_num_pages = 0;
+    char **next_word_pages = word_rbt_search(lookup_rbt, search_words[i], &next_num_pages);
+
+    display_word_set(next_word_pages, next_num_pages);
+
+    pages = intersection_word_sets(pages, size_result_set, next_word_pages, next_num_pages, &size_result_set);
+  }
+
+  printf("\nFINAL INTERSECTION SET: ");
+  display_word_set(pages, size_result_set);
+  printf("\n");
+
+  return pages;
+} 
