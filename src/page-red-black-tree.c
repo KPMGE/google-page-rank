@@ -7,10 +7,10 @@
 
 #define MAX_INCOMING_LINKS 1000
 #define DAMPING_FACTOR 0.8
-#define EPSILON 0.0001
+#define EPSILON 10e-6
 
 typedef struct {
-  float page_rank; 
+  double page_rank; 
   int num_incoming_links;
   char *incoming_links[MAX_INCOMING_LINKS];
   int num_outgoing_links;
@@ -54,16 +54,21 @@ static void free_data(void *data) {
 
 struct page_rbt {
   GRBT *rbt;
+  int total_pages;
 };
 
-PRBT* page_rbt_init() {
+PRBT* page_rbt_init(int total_pages) {
   PRBT *new_rbt = malloc(sizeof(PRBT));
   new_rbt->rbt = NULL;
+  new_rbt->total_pages = total_pages;
   return new_rbt;
 }
 
 void page_rbt_insert(PRBT *h, char *page_name) {
   h->rbt = grbt_insert(h->rbt, page_name, alloc_initial_page_data);
+  GRBT *node = grbt_search(h->rbt, page_name);
+  PageData *data = grbt_data(node);
+  data->page_rank = 1.0 / h->total_pages;
 }
 
 void page_rbt_print(PRBT *h) {
@@ -103,30 +108,32 @@ void page_rbt_free(PRBT *h) {
   free(h);
 }
 
-float calculate_page_rank(PRBT *p, char *page_name, int num_total_pages) {
+double calculate_page_rank(PRBT *p, char *page_name, int total_pages) {
   GRBT *node = grbt_search(p->rbt, page_name); 
   if (!node) return -1; // Return -1 if page is not found
 
   //Calculate the PageRank through iterations
   PageData *page = grbt_data(node);
-  page->page_rank = 1.0 / num_total_pages;
-
-  float prev_page_rank = -1;
-  float new_rank = page->page_rank;
-  float error = INFINITY;
+  double prev_page_rank = -1;
+  double new_rank = page->page_rank;
+  double error = INFINITY;
 
   while(error > EPSILON) {
     prev_page_rank = new_rank;
-    new_rank = (1 - DAMPING_FACTOR);
+    new_rank = (1.0 - DAMPING_FACTOR) / total_pages;
 
     for (int i = 0; i < page->num_incoming_links; i++) {
       GRBT *incoming_link_node = grbt_search(p->rbt, page->incoming_links[i]);
       PageData *incoming_link = grbt_data(incoming_link_node);
 
+      if (page->num_outgoing_links == 0) {
+        new_rank += DAMPING_FACTOR * incoming_link->page_rank;
+      }
+
       new_rank += DAMPING_FACTOR * (incoming_link->page_rank / incoming_link->num_outgoing_links);
     }
 
-    error = (new_rank - prev_page_rank) / num_total_pages;
+    error = (new_rank - prev_page_rank);
   }
   page->page_rank = new_rank;
 

@@ -9,7 +9,7 @@
 void usage();
 WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path, const char *pages_dir, int *total_pages);
 char **split(const char *str, const char *delimiters, int *num_tokens);
-PRBT *parse_graph_rbt(const char *graph_file_path);
+PRBT *parse_graph_rbt(const char *graph_file_path, int total_pages);
 char *read_whole_file(const char *file_path);
 void str_to_lower(char **str);
 HashTable *parse_stop_words(const char *stopwords_file_path);

@@ -44,7 +44,7 @@ int main (int argc, char *argv[]) {
 
   HashTable *table = parse_stop_words(stopwords_file_path);
   WRBT *lookup_rbt = parse_lookup_rbt(table, index_file_path, directory_path, &total_pages);
-  PRBT *pages_rbt = parse_graph_rbt(graph_file_path);
+  PRBT *pages_rbt = parse_graph_rbt(graph_file_path, total_pages);
   
   int num_searches = 0;
   char **searches = parse_searches(directory_path, &num_searches);
@@ -64,7 +64,7 @@ int main (int argc, char *argv[]) {
 
     printf("\nPAGE RANKS FOR FINAL SET:\n");
     for (int i = 0; i < size_result_set; i++) {
-      printf("page: %s, page_rank: %.3f\n", result_set[i], calculate_page_rank(pages_rbt, result_set[i], total_pages));
+      printf("page: %s, page_rank: %.6f\n", result_set[i], calculate_page_rank(pages_rbt, result_set[i], total_pages));
     }
 
     printf("\n======================================\n");

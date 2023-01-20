@@ -151,13 +151,13 @@ HashTable *parse_stop_words(const char *stopwords_file_path) {
 //   word_rbt_free(rbt);
 // }
 
-PRBT* parse_graph_rbt(const char *graph_file_path) {
+PRBT* parse_graph_rbt(const char *graph_file_path, int total_pages) {
   FILE *graph_file = fopen(graph_file_path, "r");
   check_read_file(graph_file, graph_file_path);
 
   char current_file[MAX_LINE_SIZE];
   int amount_links = 0;
-  PRBT *rbt = page_rbt_init();
+  PRBT *rbt = page_rbt_init(total_pages);
 
   char links_buffer[MAX_LINE_SIZE * 10];
 
