@@ -9,6 +9,25 @@
 
 #define DELIMITERS "\n "
 
+void display_word_set(char **set, int size_set) {
+  printf("\nset: ");
+  for (int i = 0; i < size_set; i++) {
+    if (i % 5 == 0) {
+      printf("\n");
+    }
+    printf("%s ", set[i]);
+  }
+  printf("\n");
+}
+
+
+void free_words_set(char **set, int size) {
+  for (int i = 0; i <  size; i++) {
+    if (set[i]) free(set[i]);
+  }
+  free(set);
+}
+
 int main (int argc, char *argv[]) {
   if (argc < 3) {
     usage();
@@ -33,8 +52,16 @@ int main (int argc, char *argv[]) {
 
     printf("\n======================================\n");
     printf("intersection pages for search: '%s'\n", searches[i]);
-    intersection_pages_search_words(lookup_rbt, search_words, num_search_words);
+    int size_result_set = 0;
+    char **result_set = intersection_pages_search_words(lookup_rbt, search_words, num_search_words, &size_result_set);
+
+    printf("\nFINAL INTERSECTION SET: ");
+    display_word_set(result_set, size_result_set);
+    printf("\n");
     printf("\n======================================\n");
+
+    free_words_set(search_words, num_search_words);
+    free_words_set(result_set, size_result_set);
   }
 
   for (int i = 0; i < num_searches; i++) {

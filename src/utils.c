@@ -260,34 +260,64 @@ static char **intersection_word_sets(
   return result_set;
 }
 
+
+static void free_words_set(char **set, int size) {
+  for (int i = 0; i <  size; i++) {
+    if (set[i]) free(set[i]);
+  }
+  free(set);
+}
+
 // find the intersection given a list of search words
-char** intersection_pages_search_words(WRBT *lookup_rbt, char **search_words, int num_search_words) {
-  // NOTE: (A ∩ B) ∩ C == A ∩ (B ∩ C) == B ∩ (A ∩ C)
+char** intersection_pages_search_words(WRBT *lookup_rbt, char **search_words, int num_search_words, int *num_result_set) {
+  // NOTE: from basic set theory, we know that: (A ∩ B) ∩ C == A ∩ (B ∩ C) == B ∩ (A ∩ C)
+  // so that, we can always take pairs of sets, calculate their intersection and then use it
+  // to calculate the intersection with next ones, the final result shall be the intersection between
+  // all sets.
  
   // find pages for the first search word
   printf("pages for each search word sets: \n");
 
   int num_pages = 0;
+
+  // get pages for the first word, this is useful cuz if the search has just one 
+  // item the whole for loop will be skipped later
   char **pages = word_rbt_search(lookup_rbt, search_words[0], &num_pages);
   printf("\nword: %s\n", search_words[0]);
   display_word_set(pages, num_pages);
 
-  int size_result_set = num_pages;
+  char **previous_set = NULL;
 
+  // stores the first set into memory
+  int size_result_set = num_pages;
+  char **result_set = malloc(sizeof(char *) * num_pages);
+  for (int i = 0; i < num_pages; i++) {
+    result_set[i] = strdup(pages[i]);
+  }
+  free(pages);
+
+  // iteratively calculates the final result_set, updating the 'result_set' reference
   for (int i = 1; i < num_search_words; i++) {
     printf("\nword: %s\n", search_words[i]);
     // find intersection pages between the current word and the next one and set the 'pages' buffer to the result
     int next_num_pages = 0;
     char **next_word_pages = word_rbt_search(lookup_rbt, search_words[i], &next_num_pages);
 
+    // display current word that has been used on the search
     display_word_set(next_word_pages, next_num_pages);
 
-    pages = intersection_word_sets(pages, size_result_set, next_word_pages, next_num_pages, &size_result_set);
+    // saves current set
+    previous_set = result_set;
+    int previous_set_size = size_result_set;
+
+    // calculate the intersection between the current set and the next one
+    result_set = intersection_word_sets(result_set, size_result_set, next_word_pages, next_num_pages, &size_result_set);
+
+    // free unnecessary previous_set
+    free_words_set(previous_set, previous_set_size);
+    free(next_word_pages);
   }
 
-  printf("\nFINAL INTERSECTION SET: ");
-  display_word_set(pages, size_result_set);
-  printf("\n");
-
-  return pages;
+  *num_result_set = size_result_set;
+  return result_set;
 } 
