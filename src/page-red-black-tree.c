@@ -1,12 +1,13 @@
 #include "../include/page-red-black-tree.h"
 #include "../include/generic-red-black-tree.h"
 #include <stdio.h>
+#include <math.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 
 #define MAX_INCOMING_LINKS 1000
-#define DAMPING_FACTOR 0.8
+#define DAMPING_FACTOR 0.85
 #define EPSILON 10e-6
 
 typedef struct {
@@ -21,7 +22,7 @@ static void *alloc_initial_page_data() {
 
   d->num_incoming_links = 0;
   d->num_outgoing_links = 0;
-  d->page_rank = 1.0;
+  d->page_rank = 1;
 
   return d;
 }
@@ -133,8 +134,9 @@ double calculate_page_rank(PRBT *p, char *page_name, int total_pages) {
       new_rank += DAMPING_FACTOR * (incoming_link->page_rank / incoming_link->num_outgoing_links);
     }
 
-    error = (new_rank - prev_page_rank);
+    error = fabs(new_rank - prev_page_rank) / total_pages;
   }
+
   page->page_rank = new_rank;
 
   return new_rank;
