@@ -103,13 +103,13 @@ void page_rbt_free(PRBT *h) {
   free(h);
 }
 
-float calculate_page_rank(PRBT *p, char *page_name, int num_pages) {
+float calculate_page_rank(PRBT *p, char *page_name, int num_total_pages) {
   GRBT *node = grbt_search(p->rbt, page_name); 
   if (!node) return -1; // Return -1 if page is not found
 
   //Calculate the PageRank through iterations
   PageData *page = grbt_data(node);
-  page->page_rank = 1.0 / num_pages;
+  page->page_rank = 1.0 / num_total_pages;
 
   float prev_page_rank = -1;
   float new_rank = page->page_rank;
@@ -126,7 +126,7 @@ float calculate_page_rank(PRBT *p, char *page_name, int num_pages) {
       new_rank += DAMPING_FACTOR * (incoming_link->page_rank / incoming_link->num_outgoing_links);
     }
 
-    error = (new_rank - prev_page_rank) / num_pages;
+    error = (new_rank - prev_page_rank) / num_total_pages;
   }
   page->page_rank = new_rank;
 

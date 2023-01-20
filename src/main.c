@@ -33,18 +33,21 @@ int main (int argc, char *argv[]) {
     usage();
   }
 
+
   const char *index_file_path = argv[1];
   char *index_copy = strdup(index_file_path);
   const char *stopwords_file_path = argv[2];
   const char *graph_file_path = argv[3];
+  const char *directory_path = dirname(index_copy);
+
   int total_pages = 0;
 
   HashTable *table = parse_stop_words(stopwords_file_path);
-  WRBT *lookup_rbt = parse_lookup_rbt(table, index_file_path, dirname(index_copy), &total_pages);
+  WRBT *lookup_rbt = parse_lookup_rbt(table, index_file_path, directory_path, &total_pages);
   PRBT *pages_rbt = parse_graph_rbt(graph_file_path);
   
   int num_searches = 0;
-  char **searches = parse_searches("inputs/small/searches.txt", &num_searches);
+  char **searches = parse_searches(directory_path, &num_searches);
 
   for (int i = 0; i < num_searches; i++) {
     int num_search_words = 0;
@@ -58,6 +61,12 @@ int main (int argc, char *argv[]) {
     printf("\nFINAL INTERSECTION SET: ");
     display_word_set(result_set, size_result_set);
     printf("\n");
+
+    printf("\nPAGE RANKS FOR FINAL SET:\n");
+    for (int i = 0; i < size_result_set; i++) {
+      printf("page: %s, page_rank: %.3f\n", result_set[i], calculate_page_rank(pages_rbt, result_set[i], total_pages));
+    }
+
     printf("\n======================================\n");
 
     free_words_set(search_words, num_search_words);

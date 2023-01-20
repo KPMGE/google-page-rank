@@ -196,7 +196,10 @@ static int count_file_lines(const char *file_path) {
   return count;
 }
 
-char **parse_searches(const char *search_file_path, int *num_searches) {
+char **parse_searches(const char *search_dir_path, int *num_searches) {
+  char search_file_path[MAX_LINE_SIZE];
+  sprintf(search_file_path, "%s/searches.txt", search_dir_path);
+
   FILE *search_file = fopen(search_file_path, "r");
   check_read_file(search_file, search_file_path);
 
