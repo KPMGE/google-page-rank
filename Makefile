@@ -3,7 +3,7 @@ MAIN_FILE_NAME = main
 SRC            = ./src
 INCLUDE        = ./include
 OBJ            = ./obj
-FLAGS          = -lm -pedantic -Wall -O2
+FLAGS          = -O2 -lm -pedantic -Wall -Wextra
 COMPILER       = gcc   
 
 C_FILES        = $(wildcard $(SRC)/*.c)
@@ -45,5 +45,6 @@ create_dir:
 clean:
 	@ echo "\033[1;35m"
 	@ echo "Removing temporary files..."
-	@ rm -rf $(OBJ) $(NAME_EXECUTABLE) $(BIN) *.mst *.tour
+	@ rm -rf $(OBJ) $(NAME_EXECUTABLE) $(BIN)
+	@ echo "\033[0m"
 	@ echo "\033[0m"
