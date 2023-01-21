@@ -6,6 +6,7 @@
 #include "../include/hash-table.h"
 #include "../include/word-red-black-tree.h"
 #include "../include/page-red-black-tree.h"
+#include "../include/output-binary-search-tree.h"
 
 #define DELIMITERS "\n "
 
@@ -45,7 +46,10 @@ int main (int argc, char *argv[]) {
   HashTable *table = parse_stop_words(stopwords_file_path);
   WRBT *lookup_rbt = parse_lookup_rbt(table, index_file_path, directory_path, &total_pages);
   PRBT *pages_rbt = parse_graph_rbt(graph_file_path, total_pages);
-  
+
+
+  OutBst *output_bst = NULL;
+
   int num_searches = 0;
   char **searches = parse_searches(directory_path, &num_searches);
 
@@ -64,7 +68,13 @@ int main (int argc, char *argv[]) {
 
     printf("\nPAGE RANKS FOR FINAL SET:\n");
     for (int i = 0; i < size_result_set; i++) {
-      printf("page: %s, page_rank: %.6f\n", result_set[i], calculate_page_rank(pages_rbt, result_set[i], total_pages));
+      if (!output_bst) {
+        output_bst = output_bst_new(result_set[i], calculate_page_rank(pages_rbt, result_set[i], total_pages));
+        continue;
+      }
+      output_bst = output_bst_add(output_bst, result_set[i], calculate_page_rank(pages_rbt, result_set[i], total_pages));
+
+      // printf("page: %s, page_rank: %.6f\n", result_set[i], calculate_page_rank(pages_rbt, result_set[i], total_pages));
     }
 
     printf("\n======================================\n");
@@ -81,6 +91,10 @@ int main (int argc, char *argv[]) {
   // print_table(table);
   // word_rbt_print(lookup_rbt);
   // page_rbt_print(pages_rbt);
+
+  printf("FINAL BST PAGES: \n");
+  output_bst_rec_in_order(output_bst);
+  output_bst_free(output_bst);
 
   free(index_copy);
   free_table(table);
