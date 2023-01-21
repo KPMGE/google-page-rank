@@ -28,13 +28,6 @@ static void free_out_data(OutputData *d) {
   free(d);
 }
 
-static void print_out_data(OutputData *out) {
-  printf("\n------------------------------------\n");
-  printf("page_name: %s\n", out->page_name);
-  printf("page_rank: %.6lf\n", out->page_rank);
-  printf("\n------------------------------------\n");
-}
-
 OutBst *output_bst_new(char *page_name, double page_rank) {
   OutBst *b = malloc(sizeof(OutBst));
   b->left = b->right = NULL;
@@ -61,10 +54,16 @@ void output_bst_free(OutBst *b) {
   }
 }
 
-void output_bst_rec_in_order(OutBst *b) {
-  if (!b)
-    return;
-  output_bst_rec_in_order(b->left);
-  print_out_data(b->value);
-  output_bst_rec_in_order(b->right);
+void output_bst_print_pages_in_order(OutBst *b) {
+  if (!b) return;
+  output_bst_print_pages_in_order(b->left);
+  printf("%s ", b->value->page_name);
+  output_bst_print_pages_in_order(b->right);
+}
+
+void output_bst_print_page_rank_in_order(OutBst *b) {
+  if (!b) return;
+  output_bst_print_page_rank_in_order(b->left);
+  printf("%.17lf ", b->value->page_rank);
+  output_bst_print_page_rank_in_order(b->right);
 }

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_LINE_SIZE 300
+#define MAX_LINE_SIZE 400
 #define DELIMITERS " \n"
 
 void str_to_lower(char **str) {
@@ -34,6 +34,13 @@ void usage() {
   exit(1);
 }
 
+void free_words_set(char **set, int size) {
+  for (int i = 0; i <  size; i++) {
+    if (set[i]) free(set[i]);
+  }
+  free(set);
+}
+
 WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path, const char *pages_dir, int *total_pages) {
   FILE *index_file = fopen(index_file_path, "r");
   check_read_file(index_file, index_file_path);
@@ -46,7 +53,7 @@ WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path, const char
 
     char file_path[MAX_LINE_SIZE];
     sprintf(file_path, "%s/pages/%s", pages_dir, file_name);
-    // printf("file_path: %s\n", file_path);
+
     char *file_content = read_whole_file(file_path);
 
     int amount_words = 0;
@@ -127,29 +134,6 @@ HashTable *parse_stop_words(const char *stopwords_file_path) {
 
   return table;
 }
-
-// void parse_graph_rbt(const char *graph_file_path) {
-//   FILE *graph_file = fopen(graph_file_path, "r");
-//   check_read_file(graph_file, graph_file_path);
-
-//   char current_file[MAX_LINE_SIZE];
-//   int amount_links = 0;
-//   WRBT *rbt = word_rbt_init();
-
-//   while (fscanf(graph_file, "%s %d ", current_file, &amount_links) == 2) {
-//     word_rbt_insert(rbt, current_file);
-
-//     char link[MAX_LINE_SIZE];
-//     for (int i = 0; i < amount_links; i++) {
-//       fscanf(graph_file, "%s", link);
-//       word_rbt_add_page(rbt, current_file, link);
-//     }
-//   }
-
-//   fclose(graph_file);
-//   word_rbt_print(rbt);
-//   word_rbt_free(rbt);
-// }
 
 PRBT* parse_graph_rbt(const char *graph_file_path, int total_pages) {
   FILE *graph_file = fopen(graph_file_path, "r");
@@ -263,14 +247,6 @@ static char **intersection_word_sets(
   return result_set;
 }
 
-
-static void free_words_set(char **set, int size) {
-  for (int i = 0; i <  size; i++) {
-    if (set[i]) free(set[i]);
-  }
-  free(set);
-}
-
 // find the intersection given a list of search words
 char** intersection_pages_search_words(WRBT *lookup_rbt, char **search_words, int num_search_words, int *num_result_set) {
   // NOTE: from basic set theory, we know that: (A ∩ B) ∩ C == A ∩ (B ∩ C) == B ∩ (A ∩ C)
@@ -279,15 +255,10 @@ char** intersection_pages_search_words(WRBT *lookup_rbt, char **search_words, in
   // all sets.
  
   // find pages for the first search word
-  printf("pages for each search word sets: \n");
-
   int num_pages = 0;
-
   // get pages for the first word, this is useful cuz if the search has just one 
   // item the whole for loop will be skipped later
   char **pages = word_rbt_search(lookup_rbt, search_words[0], &num_pages);
-  printf("\nword: %s\n", search_words[0]);
-  display_word_set(pages, num_pages);
 
   char **previous_set = NULL;
 
@@ -301,13 +272,9 @@ char** intersection_pages_search_words(WRBT *lookup_rbt, char **search_words, in
 
   // iteratively calculates the final result_set, updating the 'result_set' reference
   for (int i = 1; i < num_search_words; i++) {
-    printf("\nword: %s\n", search_words[i]);
     // find intersection pages between the current word and the next one and set the 'pages' buffer to the result
     int next_num_pages = 0;
     char **next_word_pages = word_rbt_search(lookup_rbt, search_words[i], &next_num_pages);
-
-    // display current word that has been used on the search
-    display_word_set(next_word_pages, next_num_pages);
 
     // saves current set
     previous_set = result_set;
