@@ -99,6 +99,7 @@ void page_rbt_add_links(PRBT *h, char *page_name, int num_outgoing_links, char *
     GRBT *node = grbt_search(h->rbt, links[i]);
     PageData *data = grbt_data(node);
     int p = data->num_incoming_links++;
+    if (p > MAX_INCOMING_LINKS) exit(1);
     // printf("store %s in the incoming_links array of %s\n", page_name, links[i]);
     data->incoming_links[p] = strdup(page_name);
   }
@@ -123,13 +124,13 @@ double calculate_page_rank(PRBT *p, char *page_name, int total_pages) {
     prev_page_rank = new_rank;
     new_rank = (1.0 - DAMPING_FACTOR) / total_pages;
 
+    if (page->num_outgoing_links == 0) {
+      new_rank += DAMPING_FACTOR * page->page_rank;
+    }
+
     for (int i = 0; i < page->num_incoming_links; i++) {
       GRBT *incoming_link_node = grbt_search(p->rbt, page->incoming_links[i]);
       PageData *incoming_link = grbt_data(incoming_link_node);
-
-      if (page->num_outgoing_links == 0) {
-        new_rank += DAMPING_FACTOR * incoming_link->page_rank;
-      }
 
       new_rank += DAMPING_FACTOR * (incoming_link->page_rank / incoming_link->num_outgoing_links);
     }

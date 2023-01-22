@@ -54,16 +54,16 @@ void output_bst_free(OutBst *b) {
   }
 }
 
-void output_bst_print_pages_in_order(OutBst *b) {
+void output_bst_print_pages_in_descending_order(OutBst *b) {
   if (!b) return;
-  output_bst_print_pages_in_order(b->left);
+  output_bst_print_pages_in_descending_order(b->right);
   printf("%s ", b->value->page_name);
-  output_bst_print_pages_in_order(b->right);
+  output_bst_print_pages_in_descending_order(b->left);
 }
 
-void output_bst_print_page_rank_in_order(OutBst *b) {
+void output_bst_print_page_rank_in_descending_order(OutBst *b) {
   if (!b) return;
-  output_bst_print_page_rank_in_order(b->left);
+  output_bst_print_page_rank_in_descending_order(b->right);
   printf("%.17lf ", b->value->page_rank);
-  output_bst_print_page_rank_in_order(b->right);
+  output_bst_print_page_rank_in_descending_order(b->left);
 }

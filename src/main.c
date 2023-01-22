@@ -47,9 +47,9 @@ int main (int argc, char *argv[]) {
 
     printf("search:%s\n", searches[i]);
     printf("pages:");
-    output_bst_print_pages_in_order(output_bst);
+    output_bst_print_pages_in_descending_order(output_bst);
     printf("\npr:");
-    output_bst_print_page_rank_in_order(output_bst);
+    output_bst_print_page_rank_in_descending_order(output_bst);
     printf("\n");
     
     output_bst_free(output_bst);
