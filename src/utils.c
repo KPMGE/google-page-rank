@@ -51,7 +51,8 @@ WRBT *parse_lookup_rbt(HashTable *table, const char *index_file_path, const char
   while (fscanf(index_file, "%s", file_name) == 1) {
     *total_pages += 1;
 
-    char file_path[MAX_LINE_SIZE];
+    const size_t buffer_size = strlen(pages_dir) + strlen("/pages/") + strlen(file_name);
+    char file_path[buffer_size];
     sprintf(file_path, "%s/pages/%s", pages_dir, file_name);
 
     char *file_content = read_whole_file(file_path);
