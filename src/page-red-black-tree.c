@@ -6,12 +6,18 @@
 #include <stdlib.h>
 #include <math.h>
 
+// the max number of incoming_links to a especific node
 #define MAX_INCOMING_LINKS 1000
+
 #define DAMPING_FACTOR 0.85
 #define EPSILON 10e-10
-#define TOTAL_PAGES 50
 
-GRBT *h_ref = NULL;
+// NOTE: i'm using those global variables in here, cuz currently, i needa use the 'grbt_search' function to 
+// get a node given its name, but as soon as a linked-list is implemented, there is no need for that anymore!
+GRBT *rbt_static = NULL;
+// i need the total amount of pages too, probably there is a better way to store that value, but it depends on 
+// the approach used to refactor the code
+int total_pages_static = 0;
 
 typedef struct {
   double page_rank; 
@@ -51,8 +57,6 @@ static void free_data(void *data) {
   for (int i = 0; i < d->num_incoming_links; i++) {
     free(d->incoming_links[i]);
   } 
-  // for now, our array is static, so we don't needa free it yet. 
-  // but we must do that later
   free(d);
 }
 
@@ -113,39 +117,33 @@ void page_rbt_free(PRBT *h) {
   free(h);
 }
 
-void test_pdf(GRBT *h, void *data) {
-  // printf("test: %s\n", grbt_search(h_ref, "a.txt") ? "ok": "not ok");
-  // printf("test: %s\n", grbt_search(h_ref, "b.txt") ? "ok": "not ok");
-  // printf("test: %s\n", grbt_search(h_ref, "c.txt") ? "ok": "not ok");
-  // printf("test: %s\n", grbt_search(h_ref, "d.txt") ? "ok": "not ok");
-  // printf("test: %s\n", grbt_search(h_ref, "e.txt") ? "ok": "not ok");
-
+// update the page rank of each page for the power-method
+static void update_page_ranks(void *data) {
+  // convert void* into a PageData
   PageData *page = data;
   if (!data) return;
 
-  double new_page_rank = (1.0 - DAMPING_FACTOR) / TOTAL_PAGES;
+  // initilize constant for initial new page-rank
+  double new_page_rank = (1.0 - DAMPING_FACTOR) / total_pages_static;
 
+  // if |Out(i)| == 0
   if (page->num_outgoing_links == 0) {
     new_page_rank += DAMPING_FACTOR * page->page_rank;
   }
 
+  // sum up page ranks from each incoming page 
   for (int i = 0; i < page->num_incoming_links; i++) {
-    // printf("incoming_link: %s\n", page->incoming_links[i]);
-    GRBT *node = grbt_search(h_ref, page->incoming_links[i]); 
-    if (!node) {
-      printf("page not found: %s\n", page->incoming_links[i]);
-      continue;
-    } 
+    GRBT *node = grbt_search(rbt_static, page->incoming_links[i]); 
+
+    if (!node) continue; 
     PageData *page_inc = grbt_data(node);
-    if (page_inc->num_outgoing_links == 0) {
-      printf("zero out\n");
-      exit(1);
-    }
+    if (page_inc->num_outgoing_links == 0) continue;
+
     new_page_rank += DAMPING_FACTOR * (page_inc->page_rank / page_inc->num_outgoing_links);
   }
 
+  // update page-rank of the current page
   page->page_rank = new_page_rank;
-  // printf("new rank: %.17lf\n", page->page_rank);
 }
 
 static double get_page_rank(GRBT *h, char *page_name) {
@@ -156,19 +154,31 @@ static double get_page_rank(GRBT *h, char *page_name) {
 }
 
 double calculate_page_rank(PRBT *p, char *page_name, int total_pages) {
-  printf("total: %d\n", total_pages);
-  h_ref = p->rbt;
+  // update the global variable with the rbt from the page-rbt. this is awful and ought be refactored!!
+  rbt_static = p->rbt;
+  // update the global variable with the total_pages. this is awful and ought be refactored!!
+  total_pages_static = total_pages;
 
+  // error starts as infinity
   double error = INFINITY;
+  double new_rank = 0;
+
   while (error > EPSILON) {
+    // get the page-rank of the page before updating.
+    // NOTE: as i said, as currently the implementation's been made with a char **, i needa 
+    // keep searching the rbt to get the nodes, which is bad
     double prev_rank = get_page_rank(p->rbt, page_name);
 
-    traverse_tree(p->rbt, test_pdf);
+    traverse_tree(p->rbt, update_page_ranks);
 
-    double new_rank = get_page_rank(p->rbt, page_name);
+    // get the page-rank of the page after updating
+    // NOTE: as i said, as currently the implementation's been made with a char **, i needa 
+    // keep searching the rbt to get the nodes, which is bad
+    new_rank = get_page_rank(p->rbt, page_name);
 
+    // update error
     error = fabs((1.0 / p->total_pages) * (new_rank - prev_rank));
   }
 
-  return get_page_rank(p->rbt, page_name);
+  return new_rank;
 }

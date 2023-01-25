@@ -133,7 +133,7 @@ void grbt_free(GRBT *h, free_fn fn) {
 void traverse_tree(GRBT *h, traverse_fn fn) {
   if (h) {
     traverse_tree(h->l, fn);
-    fn(h, h->data);
+    fn(h->data);
     traverse_tree(h->r, fn);
   }
 } 
