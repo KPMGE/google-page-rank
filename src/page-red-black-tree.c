@@ -8,7 +8,10 @@
 
 #define MAX_INCOMING_LINKS 1000
 #define DAMPING_FACTOR 0.85
-#define EPSILON 10e-6
+#define EPSILON 10e-10
+#define TOTAL_PAGES 50
+
+GRBT *h_ref = NULL;
 
 typedef struct {
   double page_rank; 
@@ -110,35 +113,62 @@ void page_rbt_free(PRBT *h) {
   free(h);
 }
 
-double calculate_page_rank(PRBT *p, char *page_name, int total_pages) {
-  GRBT *node = grbt_search(p->rbt, page_name); 
-  if (!node) return -1; // Return -1 if page is not found
+void test_pdf(GRBT *h, void *data) {
+  // printf("test: %s\n", grbt_search(h_ref, "a.txt") ? "ok": "not ok");
+  // printf("test: %s\n", grbt_search(h_ref, "b.txt") ? "ok": "not ok");
+  // printf("test: %s\n", grbt_search(h_ref, "c.txt") ? "ok": "not ok");
+  // printf("test: %s\n", grbt_search(h_ref, "d.txt") ? "ok": "not ok");
+  // printf("test: %s\n", grbt_search(h_ref, "e.txt") ? "ok": "not ok");
 
-  //Calculate the PageRank through iterations
-  PageData *page = grbt_data(node);
-  double prev_page_rank = -1;
-  double new_rank = page->page_rank;
-  double error = INFINITY;
+  PageData *page = data;
+  if (!data) return;
 
-  while(error > EPSILON) {
-    prev_page_rank = new_rank;
-    new_rank = (1.0 - DAMPING_FACTOR) / total_pages;
+  double new_page_rank = (1.0 - DAMPING_FACTOR) / TOTAL_PAGES;
 
-    if (page->num_outgoing_links == 0) {
-      new_rank += DAMPING_FACTOR * page->page_rank;
-    }
-
-    for (int i = 0; i < page->num_incoming_links; i++) {
-      GRBT *incoming_link_node = grbt_search(p->rbt, page->incoming_links[i]);
-      PageData *incoming_link = grbt_data(incoming_link_node);
-
-      new_rank += DAMPING_FACTOR * (incoming_link->page_rank / incoming_link->num_outgoing_links);
-    }
-
-    error = fabs(new_rank - prev_page_rank) / total_pages;
+  if (page->num_outgoing_links == 0) {
+    new_page_rank += DAMPING_FACTOR * page->page_rank;
   }
 
-  page->page_rank = new_rank;
+  for (int i = 0; i < page->num_incoming_links; i++) {
+    // printf("incoming_link: %s\n", page->incoming_links[i]);
+    GRBT *node = grbt_search(h_ref, page->incoming_links[i]); 
+    if (!node) {
+      printf("page not found: %s\n", page->incoming_links[i]);
+      continue;
+    } 
+    PageData *page_inc = grbt_data(node);
+    if (page_inc->num_outgoing_links == 0) {
+      printf("zero out\n");
+      exit(1);
+    }
+    new_page_rank += DAMPING_FACTOR * (page_inc->page_rank / page_inc->num_outgoing_links);
+  }
 
-  return new_rank;
+  page->page_rank = new_page_rank;
+  // printf("new rank: %.17lf\n", page->page_rank);
+}
+
+static double get_page_rank(GRBT *h, char *page_name) {
+  GRBT *node = grbt_search(h, page_name); 
+  if (!node) return -1; // Return -1 if page is not found
+  PageData *page = grbt_data(node);
+  return page->page_rank;
+}
+
+double calculate_page_rank(PRBT *p, char *page_name, int total_pages) {
+  printf("total: %d\n", total_pages);
+  h_ref = p->rbt;
+
+  double error = INFINITY;
+  while (error > EPSILON) {
+    double prev_rank = get_page_rank(p->rbt, page_name);
+
+    traverse_tree(p->rbt, test_pdf);
+
+    double new_rank = get_page_rank(p->rbt, page_name);
+
+    error = fabs((1.0 / p->total_pages) * (new_rank - prev_rank));
+  }
+
+  return get_page_rank(p->rbt, page_name);
 }

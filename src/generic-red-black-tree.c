@@ -109,6 +109,7 @@ GRBT *grbt_search(GRBT *n, char *word) {
   }
   return NULL;
 }
+
 void grbt_print(const GRBT *h, print_fn fn) {
   if (h) {
     printf("\n%s -> {", h->word);
@@ -128,3 +129,11 @@ void grbt_free(GRBT *h, free_fn fn) {
     free(h);
   }
 }
+
+void traverse_tree(GRBT *h, traverse_fn fn) {
+  if (h) {
+    traverse_tree(h->l, fn);
+    fn(h, h->data);
+    traverse_tree(h->r, fn);
+  }
+} 
