@@ -6,6 +6,9 @@ typedef struct grbt GRBT;
 typedef void (*print_fn)(void *);
 typedef void (*free_fn)(void *);
 typedef void* (*alloc_init_data)();
+typedef void (*traverse_fn)(void *);
+
+void traverse_tree(GRBT *h, traverse_fn fn);
 
 void *grbt_data(GRBT *h);
 void grbt_set_data(GRBT *h, void *data);
