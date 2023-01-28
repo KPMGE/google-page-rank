@@ -77,6 +77,17 @@ int linked_list_amount_nodes(LinkedList *list) {
   return list->amount_nodes;
 }
 
+char *linked_list_at(LinkedList *list, int pos) {
+  int i = 0; 
+  Cell *head = list->first;
+
+  for (int i = 0; i < pos; i++) {
+    head = head->next;
+  }
+
+  return head->page;
+}
+
 char **linked_list_to_pages(LinkedList *list) {
   Cell *head = list->first;
   char **pages = malloc(sizeof(char *) * list->amount_nodes);
