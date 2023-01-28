@@ -1,5 +1,6 @@
 #include "../include/page-red-black-tree.h"
 #include "../include/generic-red-black-tree.h"
+#include "../include/linked-list.h"
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -22,7 +23,8 @@ int total_pages_static = 0;
 typedef struct {
   double page_rank; 
   int num_incoming_links;
-  char *incoming_links[MAX_INCOMING_LINKS];
+  //char *incoming_links[MAX_INCOMING_LINKS];
+  LinkedList *incoming_links;
   int num_outgoing_links;
 } PageData;
 
@@ -31,32 +33,34 @@ static void *alloc_initial_page_data() {
 
   d->num_incoming_links = 0;
   d->num_outgoing_links = 0;
+  d->incoming_links = linked_list_init();
   d->page_rank = 1;
 
   return d;
 }
 
-static void print_data(void *data) {
-  PageData *d = data;
-  printf("\nnum_outgoing_links: %d", d->num_outgoing_links);
-  printf("\nnum_incoming_links: %d\n", d->num_incoming_links);
+// static void print_data(void *data) {
+//   PageData *d = data;
+//   printf("\nnum_outgoing_links: %d", d->num_outgoing_links);
+//   printf("\nnum_incoming_links: %d\n", d->num_incoming_links);
 
-  printf("incoming_links: ");
-  for (int i = 0; i < d->num_incoming_links; i++) {
-    if (i % 7 == 0) {
-      printf("\n");
-    }
-    printf("%s ", d->incoming_links[i]);
-  }
-  printf("\n");
-}
+//   printf("incoming_links: ");
+//   for (int i = 0; i < d->num_incoming_links; i++) {
+//     if (i % 7 == 0) {
+//       printf("\n");
+//     }
+//     printf("%s ", d->incoming_links[i]);
+//   }
+//   printf("\n");
+// }
 
 static void free_data(void *data) {
   PageData *d = data;
   if (!d) return;
   for (int i = 0; i < d->num_incoming_links; i++) {
-    free(d->incoming_links[i]);
+    //free(d->incoming_links[i]);
   } 
+  linked_list_free(d->incoming_links);
   free(d);
 }
 
@@ -79,9 +83,9 @@ void page_rbt_insert(PRBT *h, char *page_name) {
   data->page_rank = 1.0 / h->total_pages;
 }
 
-void page_rbt_print(PRBT *h) {
-  grbt_print(h->rbt, print_data);
-}
+// void page_rbt_print(PRBT *h) {
+//   grbt_print(h->rbt, print_data);
+// }
 
 void page_rbt_add_links(PRBT *h, char *page_name, int num_outgoing_links, char **links) {
   // find page node in the generic rbt
@@ -106,9 +110,10 @@ void page_rbt_add_links(PRBT *h, char *page_name, int num_outgoing_links, char *
     GRBT *node = grbt_search(h->rbt, links[i]);
     PageData *data = grbt_data(node);
     int p = data->num_incoming_links++;
-    if (p > MAX_INCOMING_LINKS) exit(1);
+    //if (p > MAX_INCOMING_LINKS) exit(1);
     // printf("store %s in the incoming_links array of %s\n", page_name, links[i]);
-    data->incoming_links[p] = strdup(page_name);
+    //data->incoming_links[p] = strdup(page_name);
+    linked_list_insert(data->incoming_links, page_name);
   }
 }
 
@@ -133,7 +138,7 @@ static void update_page_ranks(void *data) {
 
   // sum up page ranks from each incoming page 
   for (int i = 0; i < page->num_incoming_links; i++) {
-    GRBT *node = grbt_search(rbt_static, page->incoming_links[i]); 
+    GRBT *node = grbt_search(rbt_static, linked_list_at(page->incoming_links, i)); 
 
     if (!node) continue; 
     PageData *page_inc = grbt_data(node);
