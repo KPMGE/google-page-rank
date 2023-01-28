@@ -33,6 +33,7 @@ static void *alloc_initial_page_data() {
 
   d->num_incoming_links = 0;
   d->num_outgoing_links = 0;
+  d->incoming_links = linked_list_init();
   d->page_rank = 1;
 
   return d;
@@ -58,8 +59,8 @@ static void free_data(void *data) {
   if (!d) return;
   for (int i = 0; i < d->num_incoming_links; i++) {
     //free(d->incoming_links[i]);
-    linked_list_free(d->incoming_links);
   } 
+  linked_list_free(d->incoming_links);
   free(d);
 }
 
@@ -137,7 +138,7 @@ static void update_page_ranks(void *data) {
 
   // sum up page ranks from each incoming page 
   for (int i = 0; i < page->num_incoming_links; i++) {
-    GRBT *node = grbt_search(rbt_static, page->incoming_links[i]); 
+    GRBT *node = grbt_search(rbt_static, linked_list_at(page->incoming_links, i)); 
 
     if (!node) continue; 
     PageData *page_inc = grbt_data(node);
