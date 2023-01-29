@@ -2,6 +2,7 @@
 #define LINKED_LIST_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct linked_list LinkedList;
  
@@ -13,5 +14,6 @@ void linked_list_free(LinkedList *list);
 char **linked_list_to_pages(LinkedList *list);
 int linked_list_amount_nodes(LinkedList *list);
 char *linked_list_at(LinkedList *list, int pos);
+LinkedList **linked_list_vec_new(size_t size);
 
 #endif

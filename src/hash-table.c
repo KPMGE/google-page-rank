@@ -1,20 +1,13 @@
 #include "../include/hash-table.h"
+#include "../include/linked-list.h"
 #include "../include/utils.h"
 #include <strings.h>
+#include <assert.h>
 
 #define LARGEST_PRIME 65521
 
-struct Ht_item {
-  char *key;
-};
-
-struct LinkedList {
-  Ht_item *item;
-  LinkedList *next;
-};
-
 struct HashTable {
-  Ht_item **items;
+  char **items;
   LinkedList **overflow_buckets;
   int size;
   int count;
@@ -30,98 +23,31 @@ static unsigned long hash(const char *s) {
   return ((s2 << 16) | s1) % CAPACITY;
 }
 
-static LinkedList *allocate_list() {
-  LinkedList *list = malloc(sizeof(LinkedList));
-  list->item = NULL;
-  list->next = NULL;
-  return list;
-}
-
-static LinkedList *linkedlist_insert(LinkedList *list, Ht_item *item) {
-  if (!list) {
-    LinkedList *head = allocate_list();
-    head->item = item;
-    head->next = NULL;
-    list = head;
-    return list;
-  }
-
-  if (list->next == NULL) {
-    LinkedList *node = allocate_list();
-    node->item = item;
-    node->next = NULL;
-    list->next = node;
-    return list;
-  }
-
-  LinkedList *temp = list;
-  while (temp->next->next) {
-    temp = temp->next;
-  }
-
-  LinkedList *node = allocate_list();
-  node->item = item;
-  node->next = NULL;
-  temp->next = node;
-
-  return list;
-}
-
-static void free_item(Ht_item *item) {
-  free(item->key);
-  free(item);
-}
-
-static void free_linkedlist(LinkedList *list) {
-  LinkedList *temp = list;
-  while (list) {
-    temp = list;
-    list = list->next;
-    free_item(temp->item);
-    free(temp);
-  }
-}
-
-static LinkedList **create_overflow_buckets(HashTable *table) {
-  LinkedList **buckets = calloc(table->size, sizeof(LinkedList *));
-  for (int i = 0; i < table->size; i++) {
-    buckets[i] = NULL;
-  }
-  return buckets;
-}
-
 static void free_overflow_buckets(HashTable *table) {
   LinkedList **buckets = table->overflow_buckets;
+
   for (int i = 0; i < table->size; i++) {
-    free_linkedlist(buckets[i]);
+    linked_list_free(buckets[i]);
   }
+
   free(buckets);
-}
-
-static Ht_item *create_item(char *key) {
-  Ht_item *item = malloc(sizeof(Ht_item));
-  item->key = strdup(key); 
-
-  return item;
 }
 
 HashTable *ht_new(int size) {
   HashTable *table = malloc(sizeof(HashTable));
   table->size = size;
   table->count = 0;
-  table->items = calloc(table->size, sizeof(Ht_item *));
-  for (int i = 0; i < table->size; i++)
-    table->items[i] = NULL;
-  table->overflow_buckets = create_overflow_buckets(table);
+  table->items = calloc(table->size, sizeof(char *));
+  table->overflow_buckets = linked_list_vec_new(table->size);
 
   return table;
 }
 
 void ht_free(HashTable *table) {
   for (int i = 0; i < table->size; i++) {
-    Ht_item *item = table->items[i];
-    if (item != NULL) {
-      free_item(item);
+    char *item = table->items[i];
+    if (item) {
+      free(item);
     }
   }
 
@@ -130,56 +56,45 @@ void ht_free(HashTable *table) {
   free(table);
 }
 
-static void handle_collision(HashTable *table, unsigned long index, Ht_item *item) {
+static void handle_collision(HashTable *table, unsigned long index, char *item) {
   LinkedList *head = table->overflow_buckets[index];
 
-  if (head == NULL) {
-    head = allocate_list();
-    head->item = item;
+  if (!head) {
+    head = linked_list_init();
+    linked_list_insert(head, item);
     table->overflow_buckets[index] = head;
     return;
   } 
 
-  table->overflow_buckets[index] = linkedlist_insert(head, item);
+  linked_list_insert(head, item);
 }
 
 void ht_insert(HashTable *table, char *key) {
   str_to_lower(&key);
 
-  Ht_item *item = create_item(key);
   unsigned long index = hash(key);
-  Ht_item *current_item = table->items[index];
+  char *current_item = table->items[index];
 
-  if (current_item == NULL) {
-    if (table->count == table->size) {
-      printf("Insert Error: Hash Table is full\n");
-      free_item(item);
-      return;
-    }
-
-    table->items[index] = item;
+  if (!current_item) {
+    assert((table->count < table->size) && "table is full!");
+    table->items[index] = strdup(key);
     table->count++;
-  } else {
-    handle_collision(table, index, item);
-  }
+    return;
+  } 
+
+  handle_collision(table, index, key);
 }
 
 bool ht_search(HashTable *table, char *key) {
   str_to_lower(&key);
 
   int index = hash(key);
-  Ht_item *item = table->items[index];
+  char *item = table->items[index];
+
+  if (!item) return false;
+  if (!strcasecmp(item, key)) return true;
+
   LinkedList *head = table->overflow_buckets[index];
 
-  while (item != NULL) {
-    if (strcasecmp(item->key, key) == 0) {
-      return true;
-    }
-    if (head == NULL) {
-      return false;
-    }
-    item = head->item;
-    head = head->next;
-  }
-  return false;
+  return head ? linked_list_has_page(head, key) : false;
 }

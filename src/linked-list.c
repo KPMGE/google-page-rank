@@ -61,6 +61,8 @@ void linked_list_print(LinkedList *list) {
 }
 
 void linked_list_free(LinkedList *list) {
+  if (!list) return;
+
   Cell *head = list->first;
 
   while (head) {
@@ -98,4 +100,9 @@ char **linked_list_to_pages(LinkedList *list) {
   }
 
   return pages;
+}
+
+LinkedList **linked_list_vec_new(size_t size) {
+  LinkedList **vec = calloc(size, sizeof(LinkedList *));
+  return vec;
 }

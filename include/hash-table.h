@@ -8,10 +8,6 @@
 
 #define CAPACITY 1301
 
-typedef struct Ht_item Ht_item;
-
-typedef struct LinkedList LinkedList;
-
 typedef struct HashTable HashTable;
 
 HashTable* ht_new(int size);
