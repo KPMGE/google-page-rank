@@ -183,31 +183,3 @@ bool ht_search(HashTable *table, char *key) {
   }
   return false;
 }
-
-void search_word(HashTable *table, char *key) {
-  bool val;
-  if ((val = ht_search(table, key)) == false) {
-    printf("%s nao existe na tabela\n", key);
-    return;
-  }
-  printf("Palavra encontrada: Key:%s\n", key);
-}
-
-void print_table(HashTable *table) {
-  printf("\n-------------------\n");
-  for (int i = 0; i < table->size; i++) {
-    if (table->items[i]) {
-      printf("Index:%d, Chave:%s", i, table->items[i]->key);
-      if (table->overflow_buckets[i]) {
-        printf(" => Overflow Bucket => ");
-        LinkedList *head = table->overflow_buckets[i];
-        while (head) {
-          printf("Key:%s ", head->item->key);
-          head = head->next;
-        }
-      }
-      printf("\n");
-    }
-  }
-  printf("-------------------\n");
-}
