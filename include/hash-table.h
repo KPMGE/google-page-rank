@@ -14,11 +14,8 @@ typedef struct LinkedList LinkedList;
 
 typedef struct HashTable HashTable;
 
-Ht_item* create_item(char* key);
-HashTable* create_table(int size);
-void free_item(Ht_item* item);
-void free_table(HashTable* table);
-void handle_collision(HashTable* table, unsigned long index, Ht_item* item);
+HashTable* ht_new(int size);
+void ht_free(HashTable* table);
 void ht_insert(HashTable* table, char* key);
 bool ht_search(HashTable* table, char* key);
 void search_word(HashTable* table, char* key);

@@ -70,7 +70,7 @@ int main (int argc, char *argv[]) {
   free(index_file_path);
   free(graph_file_path);
   free(stopwords_file_path);
-  free_table(table);
+  ht_free(table);
   word_rbt_free(lookup_rbt);
   page_rbt_free(pages_rbt);
 }

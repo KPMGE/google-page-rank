@@ -20,7 +20,7 @@ struct HashTable {
   int count;
 };
 
-static unsigned long hash_function(const char *s) {
+static unsigned long hash(const char *s) {
   unsigned long s1 = 1;
   unsigned long s2 = 0;
   for (int i = 0; s[i]; i++) {
@@ -67,6 +67,11 @@ static LinkedList *linkedlist_insert(LinkedList *list, Ht_item *item) {
   return list;
 }
 
+static void free_item(Ht_item *item) {
+  free(item->key);
+  free(item);
+}
+
 static void free_linkedlist(LinkedList *list) {
   LinkedList *temp = list;
   while (list) {
@@ -93,14 +98,14 @@ static void free_overflow_buckets(HashTable *table) {
   free(buckets);
 }
 
-Ht_item *create_item(char *key) {
+static Ht_item *create_item(char *key) {
   Ht_item *item = malloc(sizeof(Ht_item));
   item->key = strdup(key); 
 
   return item;
 }
 
-HashTable *create_table(int size) {
+HashTable *ht_new(int size) {
   HashTable *table = malloc(sizeof(HashTable));
   table->size = size;
   table->count = 0;
@@ -112,12 +117,7 @@ HashTable *create_table(int size) {
   return table;
 }
 
-void free_item(Ht_item *item) {
-  free(item->key);
-  free(item);
-}
-
-void free_table(HashTable *table) {
+void ht_free(HashTable *table) {
   for (int i = 0; i < table->size; i++) {
     Ht_item *item = table->items[i];
     if (item != NULL) {
@@ -130,7 +130,7 @@ void free_table(HashTable *table) {
   free(table);
 }
 
-void handle_collision(HashTable *table, unsigned long index, Ht_item *item) {
+static void handle_collision(HashTable *table, unsigned long index, Ht_item *item) {
   LinkedList *head = table->overflow_buckets[index];
 
   if (head == NULL) {
@@ -147,7 +147,7 @@ void ht_insert(HashTable *table, char *key) {
   str_to_lower(&key);
 
   Ht_item *item = create_item(key);
-  unsigned long index = hash_function(key);
+  unsigned long index = hash(key);
   Ht_item *current_item = table->items[index];
 
   if (current_item == NULL) {
@@ -167,7 +167,7 @@ void ht_insert(HashTable *table, char *key) {
 bool ht_search(HashTable *table, char *key) {
   str_to_lower(&key);
 
-  int index = hash_function(key);
+  int index = hash(key);
   Ht_item *item = table->items[index];
   LinkedList *head = table->overflow_buckets[index];
 

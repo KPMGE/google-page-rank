@@ -125,7 +125,7 @@ HashTable *parse_stop_words(const char *stopwords_file_path) {
   check_read_file(stopwords_file, stopwords_file_path);
 
   char stopword[MAX_LINE_SIZE];
-  HashTable *table = create_table(CAPACITY);
+  HashTable *table = ht_new(CAPACITY);
 
   while (fscanf(stopwords_file, "%s\n", stopword) == 1) {
     ht_insert(table, stopword);
@@ -226,7 +226,7 @@ static char **intersection_word_sets(
   int *size_set
 ) {
   // hash-table for quickly looking up elements 
-  HashTable *table = create_table(CAPACITY);
+  HashTable *table = ht_new(CAPACITY);
 
   // insert all elements from the first set into the hash-table
   for (int i = 0; i < size_first_set; i++) {
@@ -248,7 +248,7 @@ static char **intersection_word_sets(
   }
 
   *size_set = k;
-  free_table(table);
+  ht_free(table);
 
   return result_set;
 }
