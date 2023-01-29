@@ -39,10 +39,10 @@ int main (int argc, char *argv[]) {
     OutBst *output_bst = NULL;
     for (int i = 0; i < size_result_set; i++) {
       if (!output_bst) {
-        output_bst = output_bst_new(result_set[i], calculate_page_rank(pages_rbt, result_set[i], total_pages));
+        output_bst = output_bst_new(result_set[i], calculate_page_rank(pages_rbt, result_set[i]));
         continue;
       }
-      output_bst = output_bst_add(output_bst, result_set[i], calculate_page_rank(pages_rbt, result_set[i], total_pages));
+      output_bst = output_bst_add(output_bst, result_set[i], calculate_page_rank(pages_rbt, result_set[i]));
     }
 
     printf("search:%s\n", searches[i]);

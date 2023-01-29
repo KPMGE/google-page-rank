@@ -10,10 +10,6 @@
 #define DAMPING_FACTOR 0.85
 #define EPSILON 10e-10
 
-// NOTE: i'm using those global variables in here, cuz currently, i needa use the 'grbt_search' function to 
-// get a node given its name, but as soon as a linked-list is implemented, there is no need for that anymore!
-GRBT *rbt_static = NULL;
-
 typedef struct {
   double page_rank; 
   int num_incoming_links;
@@ -36,9 +32,6 @@ static void *alloc_initial_page_data() {
 static void free_data(void *data) {
   PageData *d = data;
   if (!d) return;
-  for (int i = 0; i < d->num_incoming_links; i++) {
-    //free(d->incoming_links[i]);
-  } 
   linked_list_free(d->incoming_links);
   free(d);
 }
@@ -84,7 +77,7 @@ void page_rbt_add_links(PRBT *h, char *page_name, int num_outgoing_links, char *
   for (int i = 0; i < num_outgoing_links; i++) {
     GRBT *node = grbt_search(h->rbt, links[i]);
     PageData *data = grbt_data(node);
-    int p = data->num_incoming_links++;
+    data->num_incoming_links++;
     linked_list_insert(data->incoming_links, page_name);
   }
 }
@@ -95,7 +88,7 @@ void page_rbt_free(PRBT *h) {
 }
 
 // update the page rank of each page for the power-method
-static void update_page_ranks(void *data) {
+static void update_page_ranks(GRBT *root, void *data) {
   // convert void* into a PageData
   PageData *page = data;
   if (!data) return;
@@ -110,7 +103,7 @@ static void update_page_ranks(void *data) {
 
   // sum up page ranks from each incoming page 
   for (int i = 0; i < page->num_incoming_links; i++) {
-    GRBT *node = grbt_search(rbt_static, linked_list_at(page->incoming_links, i)); 
+    GRBT *node = grbt_search(root, linked_list_at(page->incoming_links, i)); 
 
     if (!node) continue; 
     PageData *page_inc = grbt_data(node);
@@ -130,11 +123,7 @@ static double get_page_rank(GRBT *h, char *page_name) {
   return page->page_rank;
 }
 
-double calculate_page_rank(PRBT *p, char *page_name, int total_pages) {
-  // update the global variable with the rbt from the page-rbt. this is awful and ought be refactored!!
-  rbt_static = p->rbt;
-
-  // error starts as infinity
+double calculate_page_rank(PRBT *p, char *page_name) {
   double error = INFINITY;
   double new_rank = 0;
 
@@ -143,7 +132,7 @@ double calculate_page_rank(PRBT *p, char *page_name, int total_pages) {
     double prev_rank = get_page_rank(p->rbt, page_name);
 
     // traverse rbt, updating the links
-    traverse_tree(p->rbt, update_page_ranks);
+    traverse_tree(p->rbt, p->rbt, update_page_ranks);
 
     // get the page-rank of the page after updating
     new_rank = get_page_rank(p->rbt, page_name);

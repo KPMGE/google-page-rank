@@ -78,7 +78,6 @@ int linked_list_amount_nodes(LinkedList *list) {
 }
 
 char *linked_list_at(LinkedList *list, int pos) {
-  int i = 0; 
   Cell *head = list->first;
 
   for (int i = 0; i < pos; i++) {

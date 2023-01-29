@@ -202,16 +202,21 @@ char **parse_searches(const char *search_dir_path, int *num_searches) {
   return searches;
 }
 
-static void display_word_set(char **set, int size_set) {
-  printf("\nset: ");
-  for (int i = 0; i < size_set; i++) {
-    if (i % 5 == 0) {
-      printf("\n");
+// the funcion 'display_word_set' is not used, though it can be helpful for debugging purposes, 
+// so that we just make the compiler shut up about it not giving us a warning
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+  static void display_word_set(char **set, int size_set) {
+    printf("\nset: ");
+    for (int i = 0; i < size_set; i++) {
+      if (i % 5 == 0) {
+        printf("\n");
+      }
+      printf("%s ", set[i]);
     }
-    printf("%s ", set[i]);
+    printf("\n");
   }
-  printf("\n");
-}
+#pragma GCC diagnostic pop
 
 static char **intersection_word_sets(
   char **first_set,
