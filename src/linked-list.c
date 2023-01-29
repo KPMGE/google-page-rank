@@ -7,7 +7,7 @@
 typedef struct cell Cell;
 
 struct cell {
-  char *page;
+  char *item;
   Cell *next;
 };
 
@@ -25,9 +25,9 @@ LinkedList *linked_list_init() {
   return list;
 }
 
-void linked_list_insert(LinkedList *list, char *page) {
+void linked_list_insert(LinkedList *list, char *item) {
   Cell *new = malloc(sizeof(Cell));
-  new->page = strdup(page);
+  new->item = strdup(item);
   new->next = NULL;
   list->amount_nodes++;
 
@@ -40,11 +40,11 @@ void linked_list_insert(LinkedList *list, char *page) {
   list->last = new;
 }
 
-bool linked_list_has_page(LinkedList *list, const char *page) {
+bool linked_list_has_item(LinkedList *list, const char *item) {
   Cell *head = list->first;
 
   while (head) {
-    if (strcasecmp(head->page, page) == 0) {
+    if (strcasecmp(head->item, item) == 0) {
       return true;
     }
     head = head->next;
@@ -56,7 +56,7 @@ bool linked_list_has_page(LinkedList *list, const char *page) {
 void linked_list_print(LinkedList *list) {
   Cell *p;
   for (p = list->first; p != NULL; p = p->next) {
-    printf(" %s ", p->page);
+    printf(" %s ", p->item);
   }
 }
 
@@ -68,7 +68,7 @@ void linked_list_free(LinkedList *list) {
   while (head) {
     Cell *temp = head;
     head = head->next;
-    free(temp->page);
+    free(temp->item);
     free(temp);
   }
 
@@ -86,20 +86,20 @@ char *linked_list_at(LinkedList *list, int pos) {
     head = head->next;
   }
 
-  return head->page;
+  return head->item;
 }
 
-char **linked_list_to_pages(LinkedList *list) {
+char **linked_list_to_items(LinkedList *list) {
   Cell *head = list->first;
-  char **pages = malloc(sizeof(char *) * list->amount_nodes);
+  char **items = malloc(sizeof(char *) * list->amount_nodes);
   int i = 0;
 
   while (head) {
-    pages[i++] = head->page;
+    items[i++] = head->item;
     head = head->next;
   }
 
-  return pages;
+  return items;
 }
 
 LinkedList **linked_list_vec_new(size_t size) {

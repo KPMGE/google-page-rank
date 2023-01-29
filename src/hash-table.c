@@ -96,5 +96,5 @@ bool ht_search(HashTable *table, char *key) {
 
   LinkedList *head = table->overflow_buckets[index];
 
-  return head ? linked_list_has_page(head, key) : false;
+  return head ? linked_list_has_item(head, key) : false;
 }

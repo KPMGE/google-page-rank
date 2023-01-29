@@ -44,7 +44,7 @@ char **word_rbt_search(WRBT *n, char *word, int *amount_pages) {
   LinkedList *list = grbt_data(node);
   if (!list) return NULL;
 
-  char **pages = linked_list_to_pages(list);
+  char **pages = linked_list_to_items(list);
   *amount_pages = linked_list_amount_nodes(list);
 
   return pages;
@@ -66,7 +66,7 @@ void word_rbt_add_page(WRBT *h, char *key, char *page) {
   LinkedList *pages = grbt_data(node);
   if (!pages) return;
 
-  bool page_exists = linked_list_has_page(pages, page);
+  bool page_exists = linked_list_has_item(pages, page);
   if (!page_exists) {
     linked_list_insert(pages, page); 
   }
