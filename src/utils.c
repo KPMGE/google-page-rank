@@ -30,7 +30,7 @@ void check_read_file(FILE *file, const char *file_path) {
 }
 
 void usage() {
-  fprintf(stderr, "Usage: trab3 <index_file> <stopwords_file> <graph_file>\n");
+  fprintf(stderr, "Usage: trab3 <entry folder>\n");
   exit(1);
 }
 
@@ -297,3 +297,12 @@ char** intersection_pages_search_words(WRBT *lookup_rbt, char **search_words, in
   *num_result_set = size_result_set;
   return result_set;
 } 
+
+
+int line_size(const char *dir_path, const char *file_name) {
+  return strlen(dir_path) + strlen(file_name);
+}
+
+char *alloc_string(size_t size) {
+  return malloc(sizeof(char) * size + 1);
+}

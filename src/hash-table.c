@@ -184,7 +184,7 @@ bool ht_search(HashTable *table, char *key) {
   return false;
 }
 
-void search_world(HashTable *table, char *key) {
+void search_word(HashTable *table, char *key) {
   bool val;
   if ((val = ht_search(table, key)) == false) {
     printf("%s nao existe na tabela\n", key);

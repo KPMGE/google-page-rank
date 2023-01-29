@@ -11,15 +11,20 @@
 #define DELIMITERS "\n "
 
 int main (int argc, char *argv[]) {
-  if (argc < 3) {
+  if (argc < 2) {
     usage();
   }
 
-  const char *index_file_path = argv[1];
-  char *index_copy = strdup(index_file_path);
-  const char *stopwords_file_path = argv[2];
-  const char *graph_file_path = argv[3];
-  const char *directory_path = dirname(index_copy);
+  char *directory_path = argv[1];
+
+  char *index_file_path = alloc_string(line_size(directory_path, "index.txt"));
+  sprintf(index_file_path, "%sindex.txt", directory_path);
+
+  char *stopwords_file_path = alloc_string(line_size(directory_path, "stopwords.txt"));;
+  sprintf(stopwords_file_path, "%sstopwords.txt", directory_path);
+
+  char *graph_file_path = alloc_string(line_size(directory_path, "graph.txt"));;
+  sprintf(graph_file_path, "%sgraph.txt", directory_path);
 
   int total_pages = 0;
 
@@ -62,7 +67,9 @@ int main (int argc, char *argv[]) {
   }
   free(searches);
 
-  free(index_copy);
+  free(index_file_path);
+  free(graph_file_path);
+  free(stopwords_file_path);
   free_table(table);
   word_rbt_free(lookup_rbt);
   page_rbt_free(pages_rbt);

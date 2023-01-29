@@ -21,7 +21,7 @@ void free_table(HashTable* table);
 void handle_collision(HashTable* table, unsigned long index, Ht_item* item);
 void ht_insert(HashTable* table, char* key);
 bool ht_search(HashTable* table, char* key);
-void search_world(HashTable* table, char* key);
+void search_word(HashTable* table, char* key);
 void print_table(HashTable* table);
 
 #endif

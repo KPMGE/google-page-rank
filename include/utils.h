@@ -17,5 +17,7 @@ void check_null_pointer(void *input, const char *message);
 char **parse_searches(const char *search_file_path, int *num_searches);
 char** intersection_pages_search_words(WRBT *lookup_rbt, char **search_words, int num_search_words, int *num_result_set);
 void free_words_set(char **set, int size);
+int line_size(const char *dir_path, const char *file_name);
+char *alloc_string(size_t size);
 
 #endif // !UTILS_H
